@@ -23,13 +23,13 @@ class MrmreData:
         self.survival = importr('survival')
 
         ## Declare the private or protected variables here
-        self.__data           = pd.DataFrame()
-        self.__feature_types  = pd.Series()
-        self.__strata         = pd.Series()
-        self.__weights        = pd.Series()
-        self.__priors         = np.array()
-        self.__sample_names   = list()
-        self.__feature_names  = list()
+        self._data           = pd.DataFrame()
+        self._feature_types  = pd.Series()
+        self._strata         = pd.Series()
+        self._weights        = pd.Series()
+        self._priors         = np.array()
+        self._sample_names   = list()
+        self._feature_names  = list()
 
         if not isinstance(data, pd.DataFrame):
             raise Exception('Data must be of type dataframe')
@@ -40,46 +40,46 @@ class MrmreData:
         for _, col in data.iteritems():
             # Firstly check whether the feature is survival data
             if col.name == 'time':
-                self.__feature_types.append(pd.Series([self.TIME]))
+                self._feature_types.append(pd.Series([self.TIME]))
                 continue
             elif col.name == 'event':
-                self.__feature_types.append(pd.Series([self.EVENT]))
+                self._feature_types.append(pd.Series([self.EVENT]))
                 continue
             # If not, check the feature is numeric data or categorical data (ordered-factor)
             if np.issubdtype(col.dtype, np.number):
-                self.__feature_types.append(pd.Series([self.NUMERIC]))
+                self._feature_types.append(pd.Series([self.NUMERIC]))
             elif col.dtype.name == 'category':
-                self.__feature_types.append(pd.Series([self.FACTOR]))
+                self._feature_types.append(pd.Series([self.FACTOR]))
             else:
                 raise Exception("Wrong labels")
 
-        self.__sample_names = list(data.index.values)
-        self.__feature_names = list(data.column.values)
+        self._sample_names = list(data.index.values)
+        self._feature_names = list(data.column.values)
 
         # Build the mRMR data
-        if self.__feature_types.sum() == 0:
-            self.__data = data
+        if self._feature_types.sum() == 0:
+            self._data = data
         else:
-            for i, __feature_type in self.__feature_types.iteritems():
-                if __feature_type == self.NUMERIC:
+            for i, _feature_type in self._feature_types.iteritems():
+                if _feature_type == self.NUMERIC:
                     # With the column name
-                    __feature = pd.to_numeric(data.iloc[:, i])
-                elif __feature_type in (self.TIME, self.EVENT):
-                    __feature = data.iloc[:, i]
+                    _feature = pd.to_numeric(data.iloc[:, i])
+                elif _feature_type in (self.TIME, self.EVENT):
+                    _feature = data.iloc[:, i]
                 else:
                     # Why minus one? Is the indexing problems between R and C++?
-                    __feature = data.iloc[:, i].astype(int) - 1
+                    _feature = data.iloc[:, i].astype(int) - 1
 
-                self.__data[__feature.name] = __feature
+                self._data[_feature.name] = _feature
 
         # Sample Stratum processing
-        self.__strata = strata if strata else pd.Series(np.zeros(data.shape[0]))
+        self._strata = strata if strata else pd.Series(np.zeros(data.shape[0]))
 
         # Sample Weight processing
-        self.__weights = weights if weights else pd.Series(np.ones(data.shape[0]))
+        self._weights = weights if weights else pd.Series(np.ones(data.shape[0]))
 
         # Sample Feature Matrix Processing
-        self.__priors = priors
+        self._priors = priors
 
         # No explictly return in __init__ function
 
@@ -89,6 +89,7 @@ class MrmreData:
         :return: one dataframe with feature data
         '''
         ## Still need to figure out what it want to return
+        ## Still what about the survival data? 
         for i in range(self._data.shape[1]):
             if self._feature_types[i] == 0:
 
@@ -105,7 +106,7 @@ class MrmreData:
         :return: A subset of mRMR data
         '''
         if not row_indices and not col_indices:
-            return self.__data
+            return self._data
         
         if not row_indices:
             row_indices = list(range(self.sampleCount()))
@@ -125,28 +126,28 @@ class MrmreData:
         '''
         :return:
         '''
-        return self.__data.shape[0]
+        return self._data.shape[0]
 
     ## SampleName
     def sampleNames(self):
         '''
         :return:
         '''
-        return self.__sample_names
+        return self._sample_names
     
     ## featureCount
     def featureCount(self):
         '''
         :return:
         '''
-        return len(self.__feature_names)
+        return len(self._feature_names)
     
     ## featureNames
     def featureNames(self):
         '''
         :return:
         '''
-        return self.__feature_names
+        return self._feature_names
     
     ## sampleStrata
     def sampleStrata(self, value : pd.Series = None):
@@ -155,12 +156,12 @@ class MrmreData:
         :return:
         '''
         if not value:
-            _strata = self.__strata
-            _strata.index = list(self.__data.index.values)
+            _strata = self._strata
+            _strata.index = list(self._data.index.values)
             return _strata
 
         else:
-            if len(value) != self.__data.shape[0]:
+            if len(value) != self._data.shape[0]:
                 raise Exception('Data and strata must contain the same number of samples')
             elif value.dtype.name != 'category':
                 raise Exception('Strata must be provided as factors')
@@ -168,7 +169,7 @@ class MrmreData:
                 raise Exception('Cannot have missing value in strata')
             # Why we need to return self variable in this case?
             # Do we need to minus one here?
-            self.__strata = value.astype(int)
+            self._strata = value.astype(int)
 
     ## SampleWeights
     def sampleWeights(self, value : pd.Series = None):
@@ -177,16 +178,16 @@ class MrmreData:
         :return:
         '''
         if not value:
-            _weights = self.__weights
-            _weigths.index = list(self.__data.index.values)
+            _weights = self._weights
+            _weigths.index = list(self._data.index.values)
             return _weights
         else:
-            if value.size != self.__data.shape[0]:
+            if value.size != self._data.shape[0]:
                 raise Exception('Data and weight must contain the same number of samples')
             elif value.isnull.any().any():
                 raise Exception('cannot have missing values in weights')
             
-            self.__weights = value.astype(float)        
+            self._weights = value.astype(float)        
 
     ## Priors
     def priors(self, value):
@@ -195,11 +196,11 @@ class MrmreData:
         :return: 
         '''
         if not value:
-            return self.__compressFeatureMatrix(self.__priors) if self.__priors else None
+            return self._compressFeatureMatrix(self.__priors) if self._priors else None
         else:
             if value.shape[0] != self._data.shape[0] or value.shape[1] != self._data.shape[1]:
                 raise Exception('Priors matrix must be a symmetric matrix containing as many features as data')
-            self.__priors = self.__expandFeatureMatrix(value)
+            self.__priors = self._expandFeatureMatrix(value)
 
     ## Mutual information matrix
     def mim(self, prior_weight = 0, continuous_estimator = None, outX = True, bootstrap_count = 1):
@@ -220,19 +221,19 @@ class MrmreData:
         return _mi_matrix
 
     ## expandFeatureMatrix
-    def __expandFeatureMatrix(self, matrix):
+    def _expandFeatureMatrix(self, matrix):
         _expanded_matrix = np.array()
-        _adaptor = self.__feature_types.index[self.__feature_types != 3].tolist()
+        _adaptor = self._feature_types.index[self._feature_types != 3].tolist()
         for i in range(len(_adaptor)):
             col = np.array()
             for j in range(len(_adaptor)):
                 # item should be relevant to adaptor?
                 item = matrix[_adaptor[j]][_adaptor[i]]
-                if self.__feature_types[_adaptor[j]] == 2:
+                if self._feature_types[_adaptor[j]] == 2:
                     col = col.vstack([item], [item])
                 else:
                     col = col.vstack([item])
-            if self.__feature_types[_adaptor[i]] == 2:
+            if self._feature_types[_adaptor[i]] == 2:
                 expanded_matrix.hstack(col)
                 expanded_matrix.hstack(col)
             else:
@@ -241,16 +242,16 @@ class MrmreData:
         return expanded_matrix
         
     ## compressFeatureMatrix
-    def __compressFeatureMatrix(self, matrix):
+    def _compressFeatureMatrix(self, matrix):
         
-        _adaptor = self.__feature_types.index[self.__feature_types != 3].tolist()
+        _adaptor = self._feature_types.index[self._feature_types != 3].tolist()
 
         return matrix[_adaptor, _adaptor]
 
     ## expandFeatureIndices
-    def __expandFeatureIndices(self, indices):
+    def _expandFeatureIndices(self, indices):
         # Compare the list and array? 
-        _adaptor = self.__feature_types.index[self.__feature_types == 3].tolist()
+        _adaptor = self._feature_types.index[self._feature_types == 3].tolist()
         if len(_adaptor) > 0 and (indices >= _adaptor).any():
             for i in range(len(indices)):
                 for j in range(len(_adaptor)):
@@ -260,9 +261,9 @@ class MrmreData:
         return indices
 
     ## compressFeatureIndices
-    def __compressFeatureIndices(self, indices):
+    def _compressFeatureIndices(self, indices):
         indices = np.array(indices)
-        _adaptor = self.__feature_types.index[self.__feature_types == 3].tolist()
+        _adaptor = self._feature_types.index[self._feature_types == 3].tolist()
         # It's correct here
         if len(_adaptor) > 0:
             for i in range(len(indices)):
