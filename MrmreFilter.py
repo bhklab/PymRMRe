@@ -5,14 +5,14 @@ from scipy.special import comb
 class MrmreFilter:
 
     def __init__(self,
-                 data : MrmreData,
-                 prior_weight : np.array,
-                 target_indices : np.array,
-                 levels : np.array,
-                 method : str,
-                 continous_estimator : str,
-                 outX : bool,
-                 bootstrap_count : int):
+                 data : MrmreData = None,
+                 prior_weight : np.array = None,
+                 target_indices : np.array = None,
+                 levels : np.array = None,
+                 method : str = 'bootstrap',
+                 continous_estimator : str = 'pearson',
+                 outX : bool = True,
+                 bootstrap_count : int = 0):
 
         self._method = method
         self._continous_estimator = continuous_estimator
@@ -73,13 +73,13 @@ class MrmreFilter:
         for i in range(len(result.solutions):
             sol_matrix = (data.compressFeatureIndices(result.solutions[i] + 1)).reshape(len(self._levels), np.prod(self._levels))
             self._filter.append(sol_matrix)
-        self._causality_list = list(result.casuality)
+            self._causality_list = list(result.casuality)
 
-        self._scores = [i.reshape(len(self._levels), np.prod(self._levels)) for i in result.scores]
-        _, cols_unique = np.unique(data.compressFeatureIndices(list(range(data._ncol))))
-        # Do we need to store the names of targets?
-        self._causality_list = [causality[cols_unique] for causality in self._causality_list]
-        self._mi_matrix = data.compressFeatureMatrix(mi_matrix.reshape(data._ncol, data._ncol))
+            self._scores = [i.reshape(len(self._levels), np.prod(self._levels)) for i in result.scores]
+            _, cols_unique = np.unique(data.compressFeatureIndices(list(range(data._ncol))))
+            # Do we need to store the names of targets?
+            self._causality_list = [causality[cols_unique] for causality in self._causality_list]
+            self._mi_matrix = data.compressFeatureMatrix(mi_matrix.reshape(data._ncol, data._ncol))
 
         # Ignore the feature names / sample names
 
