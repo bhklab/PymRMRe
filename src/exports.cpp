@@ -2,11 +2,13 @@
 #include <iostream>
 #include <array>
 #include <iterator>
+#include <tuple>
+#include <utility>
 
 using namespace std;
 
-Result
-Exports::export_filters(int const* const childrenCountPerLevel, double* const dataMatrix, double* const priorsMatrix, double const priorsWeight,
+std::pair <vector<vector<int>>, vector<vector<vector<double>>>>
+export_filters(int const* const childrenCountPerLevel, double* const dataMatrix, double* const priorsMatrix, double const priorsWeight,
             int const* const sampleStrata, double const* const sampleWeights, int const* const featureTypes, unsigned int const sampleCount, 
             unsigned int const featureCount, unsigned int const sampleStratumCount, unsigned int* targetFeatureIndices, unsigned int const continuousEstimator, 
             unsigned int const outX, unsigned int const bootstrapCount, double* const miMatrix)
@@ -29,37 +31,60 @@ Exports::export_filters(int const* const childrenCountPerLevel, double* const da
     unsigned int const chunk_size = solution_count * feature_count_per_solution;
     
     // Return value
-    Result result;
+    vector<vector<int>> solutions;
+    vector<vector<vector<double>>> expt;
+    vector<vector<double>> causality, scores;
+
+    expt.push_back(causality);
+    expt.push_back(scores);
     // SET_VECTOR_ELT about the result
     int targetFeatureLength = std::size(targetFeatureIndices);
-    result.solutions = new int*[targetFeatureLength];
-    result.causality = new double*[targetFeatureLength];
-    result.scores = new double*[targetFeatureLength];
+    
 
     for (unsigned int i = 0; i < targetFeatureLength; ++i)
-    {
+    {   
+        // Build new vector
+        vector<int> solutions_i;
+        vector<double> casuality_i, scores_i;
+        solutions.push_back(solutions_i);
+        expt[0].push_back(casuality_i);
+        expt[1].push_back(scores_i);
+
         Filter filter(childrenCountPerLevel, std::size(childrenCountPerLevel), &mi_matrix, targetFeatureIndices[i]);
         filter.build();
         
-        result.solutions[i] = new int[chunk_size];
-        result.causality[i] = new double[featureCount];
-        result.scores[i] = new double[chunk_size];
+        int* sol = new int[chunk_size];
+        double* cas = new double[featureCount];
+        double* sc = new double[chunk_size];
+        /* 
+        solutions.push_back(sol);
+        expt[0].push_back(cas);
+        expt[1].push_back(sc); */
 
-        filter.getSolutions(result.solutions[i]);
-        filter.getScores(result.scores[i]);
+        filter.getSolutions(sol);
+        filter.getScores(sc);
 
         for (unsigned int k = 0; k < featureCount; ++k) 
-            result.causality[i][k] = std::numeric_limits<double>::quiet_NaN();
+            cas[k] = std::numeric_limits<double>::quiet_NaN();
         
-        Math::computeCausality(result.causality[i], &mi_matrix, result.solutions[i], solution_count,
+        Math::computeCausality(cas, &mi_matrix, sol, solution_count,
                 feature_count_per_solution, featureCount, targetFeatureIndices[i]);
+
+        // After computing the solutions, casuality and scores
+        // Put the results in the vectors
+        for (unsigned int k = 0; k < chunk_size; ++k) {
+            solutions[i].push_back(sol[k]);
+            expt[1][i].push_back(sc[k]);
+        }
+        for (unsigned int k = 0; k < featureCount; ++k) 
+            expt[0][i].push_back(cas[i]);
     }
 
-    return result;
+    return std::make_pair(solutions, expt);
 }
 
-Result
-Exports::export_filters_bootstrap(unsigned int const solutionCount, unsigned int const solutionLength, double* const dataMatrix, double* const priorsMatrix,
+std::pair <vector<vector<int>>, vector<vector<vector<double>>>>
+export_filters_bootstrap(unsigned int const solutionCount, unsigned int const solutionLength, double* const dataMatrix, double* const priorsMatrix,
             double const priorsWeight, int const* const sampleStrata, double const* const sampleWeights, int const* const featureTypes, 
             unsigned int const sampleCount, unsigned int const featureCount, unsigned int const sampleStratumCount, unsigned int* targetFeatureIndices, 
             unsigned int const continuousEstimator, unsigned int const outX, unsigned int const bootstrapCount, double* const miMatrix)
@@ -80,23 +105,32 @@ Exports::export_filters_bootstrap(unsigned int const solutionCount, unsigned int
         p_children_count_per_level[i] = 1;
     
     // Return value
-    Result result;
+    vector<vector<int>> solutions;
+    vector<vector<vector<double>>> expt;
+    vector<vector<double>> causality, scores;
+
+    expt.push_back(causality);
+    expt.push_back(scores);
     // SET_VECTOR_ELT about the result
     int targetFeatureLength = std::size(targetFeatureIndices);
-    result.solutions = new int*[targetFeatureLength];
-    result.causality = new double*[targetFeatureLength];
-    result.scores = new double*[targetFeatureLength];
 
     for (unsigned int i = 0; i < targetFeatureLength; ++i)
     {
-        
-        result.solutions[i] = new int[chunk_size];
-        result.causality[i] = new double[featureCount];
-        result.scores[i] = new double[chunk_size];
+        // Build new vector
+        //vector<int> solutions_i;
+        vector<double> casuality_i;
+        //solutions.push_back(solutions_i);
+        expt[0].push_back(casuality_i);
+        //expt[1].push_back(scores_i);
 
-        for (unsigned int k = 0; k < featureCount; ++k) 
-            result.causality[i][k] = std::numeric_limits<double>::quiet_NaN();
+        //int* sol = new int[chunk_size];
+        double* cas = new double[featureCount];
+        //double* sc = new double[chunk_size];
 
+        for (unsigned int k = 0; k < featureCount; ++k) {
+            cas[k] = std::numeric_limits<double>::quiet_NaN();
+            expt[0][i].push_back(cas[k]);
+        }
     }
 
     for (unsigned int i = 0; i < solution_count; ++i)
@@ -105,20 +139,26 @@ Exports::export_filters_bootstrap(unsigned int const solutionCount, unsigned int
 
         for (unsigned int j = 0; j < targetFeatureLength; ++j) 
         {
+            vector<int> solutions_i;
+            vector<double> scores_i;
+
+            int* sol = new int[chunk_size];
+            double* sc = new double[chunk_size];
+
             Filter filter(p_children_count_per_level, feature_count_per_solution, &mi_matrix, targetFeatureIndices[j]);
             filter.build();
-            filter.getSolutions(result.solutions[j] + i * feature_count_per_solution);
+            //filter.getSolutions(solutions[j] + i * feature_count_per_solution);
         }
         data.bootstrap();
     }
 
     delete[] p_children_count_per_level;
-    return result;
+    return std::make_pair(solutions, expt);
 
 }
 
 void
-Exports::export_mim(double* const dataMatrix, double* const priorsMatrix, double const priorsWeight, int const* const sampleStrata, double const* const sampleWeights,
+export_mim(double* const dataMatrix, double* const priorsMatrix, double const priorsWeight, int const* const sampleStrata, double const* const sampleWeights,
             int const* const featureTypes, unsigned int const sampleCount, unsigned int const featureCount, unsigned int const sampleStratumCount, 
             unsigned int const continuousEstimator, unsigned int const outX, unsigned int const bootstrapCount, double* const miMatrix)
 {
@@ -133,7 +173,7 @@ Exports::export_mim(double* const dataMatrix, double* const priorsMatrix, double
 }
 
 void 
-Exports::get_thread_count(unsigned int threadCount)
+get_thread_count(unsigned int threadCount)
 {
 #ifdef _OPENMP
     threadCount = omp_get_max_threads();
@@ -143,7 +183,7 @@ Exports::get_thread_count(unsigned int threadCount)
 }
 
 void 
-Exports::set_thread_count(unsigned int const threadCount)
+set_thread_count(unsigned int const threadCount)
 {
 #ifdef _OPENMP
     opm_set_num_threads(threadCount);

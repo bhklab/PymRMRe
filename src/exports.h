@@ -3,6 +3,8 @@
 
 #include <cstdlib>
 #include <vector>
+#include <tuple>
+#include <utility>
 
 #include "Filter.h"
 #include "Math.h"
@@ -10,24 +12,11 @@
 
 using namespace std;
 
-struct Result
-{
-    int** solutions;
-    double** causality;
-    double** scores;
-};
-
-class Exports
-{
-public:
-    //void
-    //export_concordance_index();
-
-    Result 
-    export_filters(int const* const childrenCountPerLevel, double* const dataMatrix, double* const priorsMatrix, double const priorsWeight,
-            int const* const sampleStrata, double const* const sampleWeights, int const* const featureTypes, unsigned int const sampleCount, 
-            unsigned int const featureCount, unsigned int const sampleStratumCount, unsigned int* targetFeatureIndices, unsigned int const continuousEstimator, 
-            unsigned int const outX, unsigned int const bootstrapCount, double* const miMatrix);
+std::pair <vector<vector<int> >, vector<vector<vector<double> > > >
+export_filters(int const* const childrenCountPerLevel, double* const dataMatrix, double* const priorsMatrix, double const priorsWeight,
+        int const* const sampleStrata, double const* const sampleWeights, int const* const featureTypes, unsigned int const sampleCount, 
+        unsigned int const featureCount, unsigned int const sampleStratumCount, unsigned int* targetFeatureIndices, unsigned int const continuousEstimator, 
+        unsigned int const outX, unsigned int const bootstrapCount, double* const miMatrix);
         // priorsMatrix is array? Instead of matrix? 
         // dataMatrix is array? Instead of matrix?
         // FeatureCount is array? Instead of integer? 
@@ -35,26 +24,24 @@ public:
         // miMatrix is array?
         ////// The data types (const stuff) have been all clear, except the targetFeatureIndices 
     
-    Result 
-    export_filters_bootstrap(unsigned int const solutionCount, unsigned int const solutionLength, double* const dataMatrix, double* const priorsMatrix,
-            double const priorsWeight, int const* const sampleStrata, double const* const sampleWeights, int const* const featureTypes, 
-            unsigned int const sampleCount, unsigned int const featureCount, unsigned int const sampleStratumCount, unsigned int* targetFeatureIndices, 
-            unsigned int const continuousEstimator, unsigned int const outX, unsigned int const bootstrapCount, double* const miMatrix);
+std::pair <vector<vector<int> >, vector<vector<vector<double> > > >
+export_filters_bootstrap(unsigned int const solutionCount, unsigned int const solutionLength, double* const dataMatrix, double* const priorsMatrix,
+        double const priorsWeight, int const* const sampleStrata, double const* const sampleWeights, int const* const featureTypes, 
+        unsigned int const sampleCount, unsigned int const featureCount, unsigned int const sampleStratumCount, unsigned int* targetFeatureIndices, 
+        unsigned int const continuousEstimator, unsigned int const outX, unsigned int const bootstrapCount, double* const miMatrix);
 
         ////// The data types (const stuff) have been all clear, except the targetFeatureIndices 
 
-    void
-    export_mim(double* const dataMatrix, double* const priorsMatrix, double const priorsWeight, int const* const sampleStrata, double const* const sampleWeights,
-            int const* const featureTypes, unsigned int const sampleCount, unsigned int const featureCount, unsigned int const sampleStratumCount, 
-            unsigned int const continuousEstimator, unsigned int const outX, unsigned int const bootstrapCount, double* const miMatrix);
+void
+export_mim(double* const dataMatrix, double* const priorsMatrix, double const priorsWeight, int const* const sampleStrata, double const* const sampleWeights,
+        int const* const featureTypes, unsigned int const sampleCount, unsigned int const featureCount, unsigned int const sampleStratumCount, 
+        unsigned int const continuousEstimator, unsigned int const outX, unsigned int const bootstrapCount, double* const miMatrix);
 
-    void 
-    get_thread_count(unsigned int threadCount);
+void 
+get_thread_count(unsigned int threadCount);
 
-    void 
-    set_thread_count(unsigned int const threadCount);
-
-};
+void 
+set_thread_count(unsigned int const threadCount);
 
 
 #endif /* mRMRe_exports_h */
