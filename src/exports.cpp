@@ -8,15 +8,26 @@
 using namespace std;
 
 std::pair <vector<vector<int> >, vector<vector<vector<double> > > >
-c_export_filters(int const* const childrenCountPerLevel, double* const dataMatrix, double* const priorsMatrix, double const priorsWeight,
-        int const* const sampleStrata, double const* const sampleWeights, int const* const featureTypes, unsigned int const sampleCount, 
-        unsigned int const featureCount, unsigned int const sampleStratumCount, unsigned int* targetFeatureIndices, unsigned int const continuousEstimator, 
-        unsigned int const outX, unsigned int const bootstrapCount, double* const miMatrix)
+c_export_filters(const int * const childrenCountPerLevel, 
+                double* const dataMatrix, 
+                double* const priorsMatrix, 
+                const double priorsWeight,
+                const int* const sampleStrata, 
+                const double* const sampleWeights, 
+                const int* const featureTypes, 
+                const unsigned int sampleCount, 
+                const unsigned int featureCount, 
+                const unsigned int sampleStratumCount, 
+                unsigned int* targetFeatureIndices, 
+                const unsigned int continuousEstimator, 
+                const unsigned int outX, 
+                const unsigned int bootstrapCount, 
+                double* const miMatrix)
 {
     Matrix const priors_matrix(priorsMatrix, featureCount, featureCount);
 
     Matrix const* const p_priors_matrix = 
-            std::size(priorsMatrix) == featureCount * featureCount ? &priors_matrix : 0;
+            (sizeof(priorsMatrix) / sizeof(priorsMatrix[0])) == featureCount * featureCount ? &priors_matrix : 0;
 
     Data data(dataMatrix, p_priors_matrix, priorsWeight, sampleCount, featureCount, sampleStrata, sampleWeights,
             featureTypes, sampleStratumCount, continuousEstimator, outX != 0, bootstrapCount);
@@ -24,21 +35,21 @@ c_export_filters(int const* const childrenCountPerLevel, double* const dataMatri
     MutualInformationMatrix mi_matrix(&data, miMatrix);
 
     unsigned int solution_count = 1;
-    for (unsigned int i = 0; i < std::size(childrenCountPerLevel); ++i)
+    for (unsigned int i = 0; i < sizeof(childrenCountPerLevel) / sizeof(childrenCountPerLevel[0]); ++i)
         solution_count *= childrenCountPerLevel[i];
     
-    unsigned int const feature_count_per_solution = std::size(childrenCountPerLevel);
+    unsigned int const feature_count_per_solution = sizeof(childrenCountPerLevel) / sizeof(childrenCountPerLevel[0]);
     unsigned int const chunk_size = solution_count * feature_count_per_solution;
     
     // Return value
-    vector<vector<int>> solutions;
-    vector<vector<vector<double>>> expt;
-    vector<vector<double>> causality, scores;
+    vector<vector<int> > solutions;
+    vector<vector<vector<double> > > expt;
+    vector<vector<double> > causality, scores;
 
     expt.push_back(causality);
     expt.push_back(scores);
     // SET_VECTOR_ELT about the result
-    int targetFeatureLength = std::size(targetFeatureIndices);
+    int targetFeatureLength = sizeof(targetFeatureIndices) / sizeof(targetFeatureIndices[0]);
     
 
     for (unsigned int i = 0; i < targetFeatureLength; ++i)
@@ -50,7 +61,7 @@ c_export_filters(int const* const childrenCountPerLevel, double* const dataMatri
         expt[0].push_back(casuality_i);
         expt[1].push_back(scores_i);
 
-        Filter filter(childrenCountPerLevel, std::size(childrenCountPerLevel), &mi_matrix, targetFeatureIndices[i]);
+        Filter filter(childrenCountPerLevel, sizeof(childrenCountPerLevel) / sizeof(childrenCountPerLevel[0]), &mi_matrix, targetFeatureIndices[i]);
         filter.build();
         
         int* sol = new int[chunk_size];
@@ -78,11 +89,16 @@ c_export_filters(int const* const childrenCountPerLevel, double* const dataMatri
         }
         for (unsigned int k = 0; k < featureCount; ++k) 
             expt[0][i].push_back(cas[i]);
+
+        delete[] sol;
+        delete[] cas;
+        delete[] sc;
     }
 
     return std::make_pair(solutions, expt);
 }
 
+/* 
 std::pair <vector<vector<int>>, vector<vector<vector<double>>>>
 c_export_filters_bootstrap(unsigned int const solutionCount, unsigned int const solutionLength, double* const dataMatrix, double* const priorsMatrix,
             double const priorsWeight, int const* const sampleStrata, double const* const sampleWeights, int const* const featureTypes, 
@@ -155,8 +171,8 @@ c_export_filters_bootstrap(unsigned int const solutionCount, unsigned int const 
     delete[] p_children_count_per_level;
     return std::make_pair(solutions, expt);
 
-}
-
+} */
+/* 
 void
 export_mim(double* const dataMatrix, double* const priorsMatrix, double const priorsWeight, int const* const sampleStrata, double const* const sampleWeights,
             int const* const featureTypes, unsigned int const sampleCount, unsigned int const featureCount, unsigned int const sampleStratumCount, 
@@ -170,7 +186,7 @@ export_mim(double* const dataMatrix, double* const priorsMatrix, double const pr
     MutualInformationMatrix mi_matrix(&data, miMatrix);
     mi_matrix.build();
     return;
-}
+}*/
 
 void 
 get_thread_count(unsigned int threadCount)
