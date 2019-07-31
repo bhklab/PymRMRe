@@ -13,7 +13,7 @@
 using namespace std;
 
 std::pair <vector<vector<int> >, vector<vector<vector<double> > > >
-export_filters(int const* const childrenCountPerLevel, double* const dataMatrix, double* const priorsMatrix, double const priorsWeight,
+c_export_filters(int const* const childrenCountPerLevel, double* const dataMatrix, double* const priorsMatrix, double const priorsWeight,
         int const* const sampleStrata, double const* const sampleWeights, int const* const featureTypes, unsigned int const sampleCount, 
         unsigned int const featureCount, unsigned int const sampleStratumCount, unsigned int* targetFeatureIndices, unsigned int const continuousEstimator, 
         unsigned int const outX, unsigned int const bootstrapCount, double* const miMatrix);
@@ -25,7 +25,7 @@ export_filters(int const* const childrenCountPerLevel, double* const dataMatrix,
         ////// The data types (const stuff) have been all clear, except the targetFeatureIndices 
     
 std::pair <vector<vector<int> >, vector<vector<vector<double> > > >
-export_filters_bootstrap(unsigned int const solutionCount, unsigned int const solutionLength, double* const dataMatrix, double* const priorsMatrix,
+c_export_filters_bootstrap(unsigned int const solutionCount, unsigned int const solutionLength, double* const dataMatrix, double* const priorsMatrix,
         double const priorsWeight, int const* const sampleStrata, double const* const sampleWeights, int const* const featureTypes, 
         unsigned int const sampleCount, unsigned int const featureCount, unsigned int const sampleStratumCount, unsigned int* targetFeatureIndices, 
         unsigned int const continuousEstimator, unsigned int const outX, unsigned int const bootstrapCount, double* const miMatrix);
