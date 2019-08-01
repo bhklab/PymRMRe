@@ -172,21 +172,31 @@ c_export_filters_bootstrap(unsigned int const solutionCount, unsigned int const 
     return std::make_pair(solutions, expt);
 
 } */
-/* 
+
 void
-export_mim(double* const dataMatrix, double* const priorsMatrix, double const priorsWeight, int const* const sampleStrata, double const* const sampleWeights,
-            int const* const featureTypes, unsigned int const sampleCount, unsigned int const featureCount, unsigned int const sampleStratumCount, 
-            unsigned int const continuousEstimator, unsigned int const outX, unsigned int const bootstrapCount, double* const miMatrix)
+c_export_mim(double* const dataMatrix, 
+           double* const priorsMatrix, 
+           const double priorsWeight, 
+           const int* const sampleStrata, 
+           const double* const sampleWeights,
+           const int* const featureTypes, 
+           const unsigned int sampleCount, 
+           const unsigned int featureCount, 
+           const unsigned int sampleStratumCount, 
+           const unsigned int continuousEstimator, 
+           const unsigned int outX, 
+           const unsigned int bootstrapCount, 
+           double* const miMatrix)
 {
     Matrix const priors_matrix(priorsMatrix, featureCount, featureCount);
     Matrix const* const p_priors_matrix = 
-            std::size(priorsMatrix) == featureCount * featureCount ? &priors_matrix : 0;
+            (sizeof(priorsMatrix) / sizeof(priorsMatrix[0])) == featureCount * featureCount ? &priors_matrix : 0;
     Data data(dataMatrix, p_priors_matrix, priorsWeight, sampleCount, featureCount, sampleStrata, sampleWeights,
             featureTypes, sampleStratumCount, continuousEstimator, outX != 0, bootstrapCount);
     MutualInformationMatrix mi_matrix(&data, miMatrix);
     mi_matrix.build();
     return;
-}*/
+}
 
 void 
 get_thread_count(unsigned int threadCount)

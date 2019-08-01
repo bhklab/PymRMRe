@@ -17,6 +17,20 @@ cdef extern from "exports.cpp":
         const int* const sampleStrata, const double* const sampleWeights, const int* const featureTypes, const unsigned int sampleCount, 
         const unsigned int featureCount, const unsigned int sampleStratumCount, unsigned int* targetFeatureIndices, const unsigned int continuousEstimator, 
         const unsigned int outX, const unsigned int bootstrapCount, double* const miMatrix)
+
+    cdef void c_export_mim(double* const dataMatrix, 
+           double* const priorsMatrix, 
+           const double priorsWeight, 
+           const int* const sampleStrata, 
+           const double* const sampleWeights,
+           const int* const featureTypes, 
+           const unsigned int sampleCount, 
+           const unsigned int featureCount, 
+           const unsigned int sampleStratumCount, 
+           const unsigned int continuousEstimator, 
+           const unsigned int outX, 
+           const unsigned int bootstrapCount, 
+           double* const miMatrix)
     
 #    cdef pair[vector[vector[int]], vector[vector[vector[double]]]] export_filters_bootstrap(unsigned int solutionCount, 
 #        unsigned int solutionLength, double[:] dataMatrix, double[:] priorsMatrix, double priorsWeight, int[:] sampleStrata, 
@@ -54,5 +68,21 @@ def export_filters(np.ndarray[int, ndim = 1, mode = "c"] childrenCountPerLevel,
 
     return res
 
-
+def export_mim(np.ndarray[double, ndim = 1, mode = "c"] dataMatrix, 
+                np.ndarray[double, ndim = 1, mode = "c"] priorsMatrix,
+                double priorsWeight,
+                np.ndarray[int, ndim = 1, mode = "c"] sampleStrata,
+                np.ndarray[double, ndim = 1, mode = "c"] sampleWeights,
+                np.ndarray[int, ndim = 1, mode = "c"] featureTypes,
+                int sampleCount,
+                int featureCount,
+                int sampleStratumCount,
+                int continuousEstimator,
+                int outX,
+                int bootstrapCount,
+                np.ndarray[double, ndim = 1, mode = "c"] miMatrix):
     
+    c_export_mim(&dataMatrix[0], &priorsMatrix[0], priorsWeight, &sampleStrata[0], &sampleWeights[0],
+                 &featureTypes[0], sampleCount, featureCount, sampleStratumCount, continuousEstimator,
+                 outX, bootstrapCount, &miMatrix[0])
+    return 
