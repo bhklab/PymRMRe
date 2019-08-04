@@ -1,0 +1,17 @@
+class ESTIMATOR:
+    PEARSON = 0
+    SPEARMAN = 1
+    KENDALL = 2
+    FREQUENCY = 3
+
+
+class FEATURE:
+    CONTINUOUS = 0
+    DISCRETE = 1
+    SURVIVAL_EVENT = 2
+    SURVIVAL_TIME = 3
+
+
+ 
+
+    

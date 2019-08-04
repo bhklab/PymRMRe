@@ -1,6 +1,8 @@
 import numpy as np 
 import pandas as pd 
 import math
+import expt
+import constants
 import rpy2.robjects as robjects
 from rpy2.robjects.packages import importr
 from rpy2.robjects import pandas2ri
@@ -10,8 +12,11 @@ class MrmreData:
     # Data type constants
     NUMERIC  = 0
     FACTOR   = 1
-    TIME     = 2
-    EVENT    = 3
+    EVENT    = 2 # Event comes first
+    TIME     = 3
+
+    # Continuous Estimator Mapping
+    
 
     def __init__(self,
                  data : pd.DataFrame = None,
@@ -30,6 +35,10 @@ class MrmreData:
         self._priors         = np.array()
         self._sample_names   = list()
         self._feature_names  = list()
+        self._estimator_map = {'pearson'  : constants.ESTIMATOR.PEARSON, 
+                               'spearman' : constants.ESTIMATOR.SPEARMAN, 
+                               'kendall'  : constants.ESTIMATOR.KENDALL,
+                               'frequency': constants.ESTIMATOR.FREQUENCY}
 
         if not isinstance(data, pd.DataFrame):
             raise Exception('Data must be of type dataframe')
@@ -71,6 +80,9 @@ class MrmreData:
                     _feature = data.iloc[:, i].astype(int) - 1
 
                 self._data[_feature.name] = _feature
+        
+        # Naming the new dataframe (with column names)
+        ## Already done since the dataframe is composed of pandas series (with names)
 
         # Sample Stratum processing
         self._strata = strata if strata else pd.Series(np.zeros(data.shape[0]))
@@ -90,12 +102,21 @@ class MrmreData:
         '''
         ## Still need to figure out what it want to return
         ## Still what about the survival data? 
-        for i in range(self._data.shape[1]):
-            if self._feature_types[i] == 0:
+        feature_data = pd.DataFrame()
+        for i, _feature_type in self._feature_types.iteritems():
+            if _feature_type == self.NUMERIC:
+                _feature = self._data.iloc[:, i]
+            elif _feature_type == self.FACTOR:
+                _feature = self._data.iloc[:, i] + 1
+            else:
+                continue
+            feature_data[_feature.name] = _feature
+        
+        feature_data = feature_data.dropna()
+        # Build the censored data (need to check again how filter used here)
+        feature_data['censored'] = feature_data.apply(self._survBuild, axis = 1)
 
-
-
-        return
+        return feature_data
 
     def subsetData(self,
                    row_indices : list = None, 
@@ -179,7 +200,7 @@ class MrmreData:
         '''
         if not value:
             _weights = self._weights
-            _weigths.index = list(self._data.index.values)
+            _weights.index = list(self._data.index.values)
             return _weights
         else:
             if value.size != self._data.shape[0]:
@@ -196,17 +217,17 @@ class MrmreData:
         :return: 
         '''
         if not value:
-            return self._compressFeatureMatrix(self.__priors) if self._priors else None
+            return self._compressFeatureMatrix(self._priors) if self._priors else None
         else:
             if value.shape[0] != self._data.shape[0] or value.shape[1] != self._data.shape[1]:
                 raise Exception('Priors matrix must be a symmetric matrix containing as many features as data')
-            self.__priors = self._expandFeatureMatrix(value)
+            self._priors = self._expandFeatureMatrix(value)
 
     ## Mutual information matrix
-    def mim(self, prior_weight = 0, continuous_estimator = None, outX = True, bootstrap_count = 1):
+    def mim(self, prior_weight = 0, continuous_estimator = 'pearson', outX = True, bootstrap_count = 1):
         if continuous_estimator not in ['pearson', 'spearman', 'kendall', 'frequency']:
             raise Exception('The continuous estimator should be one of pearson, spearman, kendall and frequency')
-        if self.__priors:
+        if self._priors:
             if not prior_weight:
                 raise Exception('Prior weight must be provided if there are priors')
             elif prior_weight < 0 or prior_weight > 1:
@@ -214,13 +235,23 @@ class MrmreData:
         else:
             prior_weight = 0
         
-        _mi_matrix = 
         '''
-        call the cpp function
+        call the export_mim cpp function
         '''
+        _mi_matrix = np.empty([self._data.shape[1], self._data.shape[1]])
+        expt.export_mim(self._data.values, self._priors, prior_weight, self._strata.values.astype(int), 
+                        self._weights.values, self._feature_types.values, self._data.shape[0],
+                        self._data.shape[1], len(self._strata.unique()), self._estimator_map[continuous_estimator], 
+                        int(outX == true), bootstrap_count, _mi_matrix)
+        _mi_matrix = self._compressFeatureMatrix(_mi_matrix)
+        
         return _mi_matrix
 
-    ## expandFeatureMatrix
+    ## Helper function to build censored data
+    def _survBuild(self, row):
+        return np.array([row['time'], row['event']])
+
+    ## Helper function to expand FeatureMatrix
     def _expandFeatureMatrix(self, matrix):
         _expanded_matrix = np.array()
         _adaptor = self._feature_types.index[self._feature_types != 3].tolist()
@@ -241,7 +272,7 @@ class MrmreData:
 
         return expanded_matrix
         
-    ## compressFeatureMatrix
+    ## Helper function to compress FeatureMatrix
     def _compressFeatureMatrix(self, matrix):
         
         _adaptor = self._feature_types.index[self._feature_types != 3].tolist()
