@@ -8,16 +8,7 @@ from rpy2.robjects.packages import importr
 from rpy2.robjects import pandas2ri
 
 class MrmreData:
-
-    # Data type constants
-    NUMERIC  = 0
-    FACTOR   = 1
-    EVENT    = 2 # Event comes first
-    TIME     = 3
-
-    # Continuous Estimator Mapping
-    
-
+  
     def __init__(self,
                  data : pd.DataFrame = None,
                  strata : pd.Series = None,
@@ -40,6 +31,11 @@ class MrmreData:
                                'kendall'  : constants.ESTIMATOR.KENDALL,
                                'frequency': constants.ESTIMATOR.FREQUENCY}
 
+        self._features_map = {'continuous': constants.FEATURE.CONTINUOUS,
+                              'discrete'  : constants.FEATURE.DISCRETE,
+                              'time'      : constants.FEATURE.TIME,
+                              'event'     : constants.FEATURE.EVENT}
+
         if not isinstance(data, pd.DataFrame):
             raise Exception('Data must be of type dataframe')
         if data.shape[1] > (math.sqrt(2^31) - 1):
@@ -47,18 +43,16 @@ class MrmreData:
  
         # Define the feature types of the data
         for _, col in data.iteritems():
-            # Firstly check whether the feature is survival data
-            if col.name == 'time':
-                self._feature_types.append(pd.Series([self.TIME]))
+            # Firstly check whether the feature is survival data (depends on the column names)
+            if col.name in ['time', 'event']:
+                self._feature_types.append(pd.Series([self._feature_map[col.name]]))
                 continue
-            elif col.name == 'event':
-                self._feature_types.append(pd.Series([self.EVENT]))
-                continue
+            
             # If not, check the feature is numeric data or categorical data (ordered-factor)
             if np.issubdtype(col.dtype, np.number):
-                self._feature_types.append(pd.Series([self.NUMERIC]))
+                self._feature_types.append(pd.Series([self._feature_map['continuous']]))
             elif col.dtype.name == 'category':
-                self._feature_types.append(pd.Series([self.FACTOR]))
+                self._feature_types.append(pd.Series([self._feature_map['discrete']]))
             else:
                 raise Exception("Wrong labels")
 
@@ -70,10 +64,10 @@ class MrmreData:
             self._data = data
         else:
             for i, _feature_type in self._feature_types.iteritems():
-                if _feature_type == self.NUMERIC:
+                if _feature_type == self._feature_map['continuous']:
                     # With the column name
                     _feature = pd.to_numeric(data.iloc[:, i])
-                elif _feature_type in (self.TIME, self.EVENT):
+                elif _feature_type in (self._feature_map['time'], self._feature_map['event']):
                     _feature = data.iloc[:, i]
                 else:
                     # Why minus one? Is the indexing problems between R and C++?
@@ -104,9 +98,9 @@ class MrmreData:
         ## Still what about the survival data? 
         feature_data = pd.DataFrame()
         for i, _feature_type in self._feature_types.iteritems():
-            if _feature_type == self.NUMERIC:
+            if _feature_type == self._feature_map['continuous']:
                 _feature = self._data.iloc[:, i]
-            elif _feature_type == self.FACTOR:
+            elif _feature_type == self._feature_map['discrete']:
                 _feature = self._data.iloc[:, i] + 1
             else:
                 continue
@@ -239,10 +233,23 @@ class MrmreData:
         call the export_mim cpp function
         '''
         _mi_matrix = np.empty([self._data.shape[1], self._data.shape[1]])
-        expt.export_mim(self._data.values, self._priors, prior_weight, self._strata.values.astype(int), 
-                        self._weights.values, self._feature_types.values, self._data.shape[0],
-                        self._data.shape[1], len(self._strata.unique()), self._estimator_map[continuous_estimator], 
-                        int(outX == true), bootstrap_count, _mi_matrix)
+        ######################
+        ## Need to convert all 2d arrays to 1d ??
+        ######################
+        expt.export_mim(self._data.values, 
+                        self._priors.flatten(), 
+                        prior_weight, 
+                        self._strata.values.astype(int), 
+                        self._weights.values, 
+                        self._feature_types.values, 
+                        self._data.shape[0],
+                        self._data.shape[1], 
+                        len(self._strata.unique()), 
+                        self._estimator_map[continuous_estimator], 
+                        int(outX == true), 
+                        bootstrap_count, 
+                        _mi_matrix.flatten())
+        
         _mi_matrix = self._compressFeatureMatrix(_mi_matrix)
         
         return _mi_matrix
@@ -265,12 +272,12 @@ class MrmreData:
                 else:
                     col = col.vstack([item])
             if self._feature_types[_adaptor[i]] == 2:
-                expanded_matrix.hstack(col)
-                expanded_matrix.hstack(col)
+                _expanded_matrix.hstack(col)
+                _expanded_matrix.hstack(col)
             else:
-                expanded_matrix.hstack(col)
+                _expanded_matrix.hstack(col)
 
-        return expanded_matrix
+        return _expanded_matrix
         
     ## Helper function to compress FeatureMatrix
     def _compressFeatureMatrix(self, matrix):
