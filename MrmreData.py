@@ -236,7 +236,7 @@ class MrmreData:
         ######################
         ## Need to convert all 2d arrays to 1d ??
         ######################
-        expt.export_mim(self._data.values, 
+        expt.export_mim(self._data.values.flatten(), 
                         self._priors.flatten(), 
                         prior_weight, 
                         self._strata.values.astype(int), 
@@ -259,6 +259,9 @@ class MrmreData:
         return np.array([row['time'], row['event']])
 
     ## Helper function to expand FeatureMatrix
+    # It seems like functions about feature matrix return array, but the functions about 
+    # feature indices return pandas series ? Should still be array
+
     def _expandFeatureMatrix(self, matrix):
         _expanded_matrix = np.array()
         _adaptor = self._feature_types.index[self._feature_types != 3].tolist()
@@ -310,7 +313,7 @@ class MrmreData:
 
         return indices
 
-    def scores(self, solutions):
+    def _scores(self, solutions):
         '''
         Better develop that after the finish of mRMR.Filter class
         '''

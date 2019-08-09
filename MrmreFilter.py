@@ -1,12 +1,14 @@
 import numpy as np 
 import pandas as pd 
+import constants
+import expt
 from scipy.special import comb
 
 class MrmreFilter:
 
     def __init__(self,
                  data : MrmreData = None,
-                 prior_weight : np.array = None,
+                 prior_weight : float = None,
                  target_indices : np.array = None,
                  levels : np.array = None,
                  method : str = 'bootstrap',
@@ -14,8 +16,18 @@ class MrmreFilter:
                  outX : bool = True,
                  bootstrap_count : int = 0):
 
+        ## Declare the private or protected variables here
+        self._estimator_map = {'pearson'  : constants.ESTIMATOR.PEARSON, 
+                               'spearman' : constants.ESTIMATOR.SPEARMAN, 
+                               'kendall'  : constants.ESTIMATOR.KENDALL,
+                               'frequency': constants.ESTIMATOR.FREQUENCY}
         self._method = method
-        self._continous_estimator = continuous_estimator
+        self._continous_estimator = self._estimator_map[continous_estimator]
+        self._filter = pd.Series()
+        self._scores = pd.Series()
+        self._causality_list = pd.Series()
+        self._feature_names = data._featureNames()
+        self._sample_names = data._sampleNames()
 
         if type(data) != 'mRMRe_data':
             raise Exception('data must be of type mRMRe_data')
@@ -33,20 +45,19 @@ class MrmreFilter:
         if any(x < 1 for x in target_indices) or any(x > data.featureCount() for x in target_indices):
             raise Exception('target indices must only contain values ranging from 1 to the number of features in data')
         
+        self._target_indices = target_indices.astype(int)
         ## Level processing
 
         if not levels:
             raise Exception('levels must be provided')
-
-        self._target_indices = target_indices.astype(int)
+        
         self._levels = levels.astype(int)
 
         # The index 0/1 problems?
-        target_indices = data.expandFeatureIndices(target_indices).astype(int) - 1
+        target_indices = data._expandFeatureIndices(target_indices).astype(int) - 1
 
         ## Filter; Mutual Information and Causality Matrix
-
-        mi_matrix = np.zeros((data._nrow, data._ncol))
+        mi_matrix = np.empty([data._nrow, data._ncol])
 
         if method == 'exhaustive':
 
@@ -54,36 +65,63 @@ class MrmreFilter:
             if np.prod(levels) - 1 > comb(data._featureCount - 1, len(levels)):
                 raise Exception('user cannot request for more solutions than is possible given the data set')
 
+            res = expt.export_filters(self._levels，
+                                      data._data.values.flatten(),
+                                      data._priors,
+                                      prior_weight,
+                                      data._strata,
+                                      data._weights,
+                                      data._feature_types,
+                                      data._data.shape[0],
+                                      data._data.shape[1],
+                                      len(data._strata.unique()),
+                                      target_indices,
+                                      self._estimator_map[continuous_estimator],
+                                      int(outX == true),
+                                      bootstrap_count,
+                                      mi_matrix)
             '''
             Call the cpp functions 
             '''
-            result 
+
+            #result 
+        '''
         elif method == 'bootstrap':
-            '''
-            Call the cpp functions
-            '''
+            
+            #Call the cpp functions
+            
             result 
+        '''
         else:
             raise Exception('Unrecognized method: use exhaustive or bootstrap')
 
 
         ## After building the result, result is the data structure of Result defind in exports.h
         ## The returned filter is object of list
-        self._filters = []
-        for i in range(len(result.solutions):
-            sol_matrix = (data.compressFeatureIndices(result.solutions[i] + 1)).reshape(len(self._levels), np.prod(self._levels))
-            self._filter.append(sol_matrix)
-            self._causality_list = list(result.casuality)
+        ## The returned filter need to use target lists as name
+        solutions = res[0]              # List<List<int>>
+        causality_list = res[1][0]      # List<List<float>>
+        scores = res[1][1]              # List<List<float>>
+        
+        # Build the filter based on solutions
+        for i, sol in enumerate(solutions):
+            sol_matrix = data._compressFeatureIndices(sol + 1).reshape(len(self._levels), np.prod(self._levels))
+            self._filter.set(target_indices[i], [sol_matrix]) # Also set the index 
+        
+        # Build the causality list
+        _, cols_unique = np.unique(data._compressFeatureIndices(list(range(data._ncol))), return_index=true)
+        for i, causality_array in enumerate(causality_list):
+            causality_array = causality_array[cols_unique]
+            self._causality_list.set(target_indices[i], [causality_array])
 
-            self._scores = [i.reshape(len(self._levels), np.prod(self._levels)) for i in result.scores]
-            _, cols_unique = np.unique(data.compressFeatureIndices(list(range(data._ncol))))
-            # Do we need to store the names of targets?
-            self._causality_list = [causality[cols_unique] for causality in self._causality_list]
-            self._mi_matrix = data.compressFeatureMatrix(mi_matrix.reshape(data._ncol, data._ncol))
-
-        # Ignore the feature names / sample names
-
-    
+        # Build the scores matrix
+        for i, score in enumerate(scores):
+            sc_matrix = score.reshape(len(self._levels), np.prod(self._levels))
+            self._scores.set(target_indices[i], [sc_matrix])
+        
+        # Build the mutual information matrix
+        self._mi_matrix = data._compressFeatureMatrix(mi_matrix.reshape(data._ncol, data._ncol))
+        
 
     def sampleCount(self):
 
@@ -105,22 +143,25 @@ class MrmreFilter:
         # filters[target][solution, ] is a vector of selected features
         # in a solution for a target; missing values denote removed features
         ## One question is why we need the string here?
-        filters = []
+        filters = pd.Series()
         for target_index in self._target_indices:
-            res
-
-
-            result_matrix = self._filters[target_index]
-            ### numpy where return a turple, the first element is the indices array
-            causality_dropped = np.where(np.array(self._casuality_list[str(target_index)] > causality_threshold))[0]
-            mi_dropped = np.where(np.array(-.5 * np.log(1 - np.square(self._mi_matrix[:,target_index])) < mi_threshold))[0]
-            # Need to apply the Nan operation here?
-            pre_return_matrix = np.flip(result_matrix, axis = 1)
-        filters.append(pre_return_matrix)
-
+            result_matrix = self._filters.loc[[target_index]]
+            causality_dropped, _ = np.where(self._causality_list.loc[[target_index]] > causality_threshold)
+            mi_dropped, _ = np.where(-.5 * np.log(1 - np.square(self._mi_matrix[:, target_index])) < mi_threshold)
+             
+            # Apply the Nan operation here
+            for idx in set(list(causality_dropped) + list(mi_dropped)):
+                i, j = idx % result_matrix.shape[0], idx // result_matrix.shape[0]
+                result_matrix[i][j] = np.nan 
+    
+            pre_return_matrix = np.flip(result_matrix, axis = 0)
+            filters.append(pre_return_matrix)
+        
+        filters.reindex(target_indices)
+        
         return filters
 
-    def scores(self):
+    def _scores(self):
         mi_matrix = self.mim()
         # No need to use the string style of targets, it is for the names of columns in R
         targets = self._target_indices
