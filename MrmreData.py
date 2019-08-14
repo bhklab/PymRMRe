@@ -205,7 +205,7 @@ class MrmreData:
             self._weights = value.astype(float)        
 
     ## Priors
-    def priors(self, value):
+    def _priors(self, value):
         '''
         :param value: A numpy matrix
         :return: 
@@ -218,7 +218,7 @@ class MrmreData:
             self._priors = self._expandFeatureMatrix(value)
 
     ## Mutual information matrix
-    def mim(self, prior_weight = 0, continuous_estimator = 'pearson', outX = True, bootstrap_count = 1):
+    def _mim(self, prior_weight = 0, continuous_estimator = 'pearson', outX = True, bootstrap_count = 1):
         if continuous_estimator not in ['pearson', 'spearman', 'kendall', 'frequency']:
             raise Exception('The continuous estimator should be one of pearson, spearman, kendall and frequency')
         if self._priors:
@@ -317,8 +317,31 @@ class MrmreData:
         '''
         Better develop that after the finish of mRMR.Filter class
         '''
-        mi_matrix = self.mim()
-        targets = 
+        mi_matrix = self._mim()
+        target_indices = solutions.index.values.tolist()
+        scores = pd.Series()
+        
+        for i, target in enumerate(target_indices):
+            sub_solution = solutions.loc(target)   # The sub_solution is matrix(np.array)
+            sub_score_target = np.array()
+            for col in range(sub_solution.shape[1]):
+                sub_score = list()
+                previous_features_mean = list()
+                for j in range(sub_solution[:, col].shape[0]):
+                    feature_j = sub_solution[:, col][j]
+                    if j == 0:
+                        sub_score.append(mi_matrix[target, feature_j])
+                        continue
+                    previous_features_mean.append(mi_matrix[target, sub_solution[:, col][j - 1]])
+                    ancestry_score = sum(previous_features_mean) / len(previous_features_mean)
+                    sub_score.append(mi_matrix[target, feature_j] - ancestry_score)
+                sub_score_target = np.hstack(sub_score_target, np.array(sub_score))
+            
+            scores.append(sub_score_target)
+        
+        scores.reindex(target_indices)
+        
+        return scores
 
 
 

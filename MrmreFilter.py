@@ -57,7 +57,10 @@ class MrmreFilter:
         target_indices = data._expandFeatureIndices(target_indices).astype(int) - 1
 
         ## Filter; Mutual Information and Causality Matrix
-        mi_matrix = np.empty([data._nrow, data._ncol])
+        # Nan operation here ?
+        #mi_matrix = np.empty([data._nrow, data._ncol])
+        mi_matrix = np.zeros(data._nrow, data._ncol)
+        mi_matrix.fill(np.nan)
 
         if method == 'exhaustive':
 
@@ -139,7 +142,7 @@ class MrmreFilter:
 
         return data._feature_names
 
-    def solutions(self, mi_threshold = -float('inf'), causality_threshold = float('inf')):
+    def _solutions(self, mi_threshold = -float('inf'), causality_threshold = float('inf')):
         # filters[target][solution, ] is a vector of selected features
         # in a solution for a target; missing values denote removed features
         ## One question is why we need the string here?
@@ -158,16 +161,47 @@ class MrmreFilter:
             filters.append(pre_return_matrix)
         
         filters.reindex(target_indices)
-        
+
         return filters
 
     def _scores(self):
         mi_matrix = self.mim()
-        # No need to use the string style of targets, it is for the names of columns in R
-        targets = self._target_indices
+        target_indices = self._target_indices
+        scores = pd.Series()
+        solutions = self._solutions()
+        for i, target in enumerate(target_indices):
+            # 
+            sub_solution = solutions.loc(target)   # The sub_solution is matrix(np.array)
+            sub_score_target = np.array()
+            for col in range(sub_solution.shape[1]):
+                sub_score = list()
+                previous_features_mean = list()
+                for j in range(sub_solution[:, col].shape[0]):
+                    feature_j = sub_solution[:, col][j]
+                    if j == 0:
+                        sub_score.append(mi_matrix[target, feature_j])
+                        continue
+                    previous_features_mean.append(mi_matrix[target, sub_solution[:, col][j - 1]])
+                    ancestry_score = sum(previous_features_mean) / len(previous_features_mean)
+                    sub_score.append(mi_matrix[target, feature_j] - ancestry_score)
+                sub_score_target = np.hstack(sub_score_target, np.array(sub_score))
+            
+            scores.append(sub_score_target)
+        
+        scores.reindex(target_indices)
+        
+        return scores
 
-        scores = []
-        for target in targets:
+                    
+                    
+
+
+
+
+            
+
+
+
 
 
 
