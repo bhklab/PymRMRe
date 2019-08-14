@@ -147,6 +147,7 @@ class MrmreFilter:
         # in a solution for a target; missing values denote removed features
         ## One question is why we need the string here?
         filters = pd.Series()
+        target_indices = self._target_indices
         for target_index in self._target_indices:
             result_matrix = self._filters.loc[[target_index]]
             causality_dropped, _ = np.where(self._causality_list.loc[[target_index]] > causality_threshold)
@@ -160,7 +161,7 @@ class MrmreFilter:
             pre_return_matrix = np.flip(result_matrix, axis = 0)
             filters.append(pre_return_matrix)
         
-        filters.reindex(target_indices)
+        filters.index = target_indices
 
         return filters
 
@@ -188,7 +189,7 @@ class MrmreFilter:
             
             scores.append(sub_score_target)
         
-        scores.reindex(target_indices)
+        scores.index = target_indices
         
         return scores
 
