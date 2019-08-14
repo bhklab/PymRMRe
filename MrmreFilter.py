@@ -109,18 +109,27 @@ class MrmreFilter:
         # Build the filter based on solutions
         for i, sol in enumerate(solutions):
             sol_matrix = data._compressFeatureIndices(sol + 1).reshape(len(self._levels), np.prod(self._levels))
-            self._filter.set(target_indices[i], [sol_matrix]) # Also set the index 
+            #self._filter.set(target_indices[i], [sol_matrix]) # Also set the index 
+            self._filter = self._filter.append(pd.Series([sol_matrix]))
+        
+        self._filter.index = target_indices
         
         # Build the causality list
         _, cols_unique = np.unique(data._compressFeatureIndices(list(range(data._ncol))), return_index=true)
         for i, causality_array in enumerate(causality_list):
             causality_array = causality_array[cols_unique]
-            self._causality_list.set(target_indices[i], [causality_array])
+            #self._causality_list.set(target_indices[i], [causality_array])
+            self._causality_list = self._causality_list.append(pd.Series([causality_array]))
+        
+        self._causality_list.index = target_indices
 
         # Build the scores matrix
         for i, score in enumerate(scores):
             sc_matrix = score.reshape(len(self._levels), np.prod(self._levels))
-            self._scores.set(target_indices[i], [sc_matrix])
+            #self._scores.set(target_indices[i], [sc_matrix])
+            self._scores = self._scores.append(pd.Series([sc_matrix]))
+
+        self._scores.index = target_indices
         
         # Build the mutual information matrix
         self._mi_matrix = data._compressFeatureMatrix(mi_matrix.reshape(data._ncol, data._ncol))
@@ -159,7 +168,7 @@ class MrmreFilter:
                 result_matrix[i][j] = np.nan 
     
             pre_return_matrix = np.flip(result_matrix, axis = 0)
-            filters.append(pre_return_matrix)
+            filters = filters.append(pd.Series([pre_return_matrix]))
         
         filters.index = target_indices
 
@@ -187,26 +196,12 @@ class MrmreFilter:
                     sub_score.append(mi_matrix[target, feature_j] - ancestry_score)
                 sub_score_target = np.hstack(sub_score_target, np.array(sub_score))
             
-            scores.append(sub_score_target)
+            scores = scores.append(pd.Series([sub_score_target]))
         
         scores.index = target_indices
         
         return scores
 
-                    
-                    
-
-
-
-
-            
-
-
-
-
-
-
-        return
 
     def mim(self, method):
         ## The method should be within mi or cor
