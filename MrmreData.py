@@ -263,47 +263,50 @@ class MrmreData:
     # feature indices return pandas series ? Should still be array
 
     def _expandFeatureMatrix(self, matrix):
-        _expanded_matrix = np.array()
-        _adaptor = self._feature_types.index[self._feature_types != 3].tolist()
-        for i in range(len(_adaptor)):
+        expanded_matrix = np.array()
+        adaptor = self._feature_types.index[self._feature_types != 3].tolist()
+        for i in range(len(adaptor)):
             col = np.array()
-            for j in range(len(_adaptor)):
-                # item should be relevant to adaptor?
-                item = matrix[_adaptor[j]][_adaptor[i]]
-                if self._feature_types[_adaptor[j]] == 2:
-                    col = col.vstack([item], [item])
+            for j in range(len(adaptor)): 
+                # Row binding 
+                item = matrix[adaptor[j]][adaptor[i]]
+                if self._feature_types[adaptor[j]] == 2:
+                    col = np.vstack((col, item))
+                    col = np.vstack((col, item))
                 else:
-                    col = col.vstack([item])
-            if self._feature_types[_adaptor[i]] == 2:
-                _expanded_matrix.hstack(col)
-                _expanded_matrix.hstack(col)
+                    col = np.vstack((col, item))
+            # Column binding
+            if self._feature_types[adaptor[i]] == 2:
+                expanded_matrix = np.hstack((expanded_matrix, col))
+                expanded_matrix = np.hstack((expanded_matrix, col))
             else:
-                _expanded_matrix.hstack(col)
+                expanded_matrix = np.hstack((expanded_matrix, col))
 
-        return _expanded_matrix
+        return expanded_matrix
         
     ## Helper function to compress FeatureMatrix
     def _compressFeatureMatrix(self, matrix):
         
-        _adaptor = self._feature_types.index[self._feature_types != 3].tolist()
+        adaptor = self._feature_types.index[self._feature_types != 3].tolist()
 
-        return matrix[_adaptor, _adaptor]
+        return matrix[adaptor, adaptor]
 
     ## expandFeatureIndices
     def _expandFeatureIndices(self, indices):
-        # Compare the list and array? 
-        _adaptor = self._feature_types.index[self._feature_types == 3].tolist()
-        if len(_adaptor) > 0 and (indices >= _adaptor).any():
+        indices = list(indices)
+        adaptor = self._feature_types.index[self._feature_types == 3].tolist()
+        if len(adaptor) > 0 and (indices >= adaptor).any():
             for i in range(len(indices)):
-                for j in range(len(_adaptor)):
+                for j in range(len(adaptor)):
                     # 0/1 Indexing problem? Why plus one here?
-                    indices[i] += (indices[i] >= (_adaptor[j] - j + 1))
+                    ## Does not matter
+                    indices[i] += (indices[i] >= (adaptor[j] - j + 1))
 
-        return indices
+        return np.array(indices)
 
     ## compressFeatureIndices
     def _compressFeatureIndices(self, indices):
-        indices = np.array(indices)
+        indices = list(indices)
         _adaptor = self._feature_types.index[self._feature_types == 3].tolist()
         # It's correct here
         if len(_adaptor) > 0:
@@ -311,7 +314,7 @@ class MrmreData:
                 for j in range(len(_adaptor)):
                     indices[i] -= (indices[i] >= _adaptor[j])
 
-        return indices
+        return np.array(indices)
 
     def _scores(self, solutions):
         '''
@@ -320,7 +323,7 @@ class MrmreData:
         mi_matrix = self._mim()
         target_indices = solutions.index.values.tolist()
         scores = pd.Series()
-        
+
         for i, target in enumerate(target_indices):
             sub_solution = solutions.loc(target)   # The sub_solution is matrix(np.array)
             sub_score_target = np.array()
