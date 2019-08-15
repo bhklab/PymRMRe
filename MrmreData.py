@@ -1,8 +1,9 @@
 import numpy as np 
 import pandas as pd 
 import math
-import expt
-import constants
+from src.expt import export_mim
+from src.expt import export_filters
+from constants import *
 import rpy2.robjects as robjects
 from rpy2.robjects.packages import importr
 from rpy2.robjects import pandas2ri
@@ -45,14 +46,14 @@ class MrmreData:
         for _, col in data.iteritems():
             # Firstly check whether the feature is survival data (depends on the column names)
             if col.name in ['time', 'event']:
-                self._feature_types.append(pd.Series([self._feature_map[col.name]]))
+                self._feature_types = self._feature_types.append(pd.Series([self._feature_map[col.name]]))
                 continue
             
             # If not, check the feature is numeric data or categorical data (ordered-factor)
             if np.issubdtype(col.dtype, np.number):
-                self._feature_types.append(pd.Series([self._feature_map['continuous']]))
+                self._feature_types = self._feature_types.append(pd.Series([self._feature_map['continuous']]))
             elif col.dtype.name == 'category':
-                self._feature_types.append(pd.Series([self._feature_map['discrete']]))
+                self._feature_types = self._feature_types.append(pd.Series([self._feature_map['discrete']]))
             else:
                 raise Exception("Wrong labels")
 
@@ -63,17 +64,17 @@ class MrmreData:
         if self._feature_types.sum() == 0:
             self._data = data
         else:
-            for i, _feature_type in self._feature_types.iteritems():
-                if _feature_type == self._feature_map['continuous']:
+            for i, feature_type in self._feature_types.iteritems():
+                if feature_type == self._feature_map['continuous']:
                     # With the column name
-                    _feature = pd.to_numeric(data.iloc[:, i])
-                elif _feature_type in (self._feature_map['time'], self._feature_map['event']):
-                    _feature = data.iloc[:, i]
+                    feature = pd.to_numeric(data.iloc[:, i])
+                elif feature_type in (self._feature_map['time'], self._feature_map['event']):
+                    feature = data.iloc[:, i]
                 else:
                     # Why minus one? Is the indexing problems between R and C++?
-                    _feature = data.iloc[:, i].astype(int) - 1
+                    feature = data.iloc[:, i].astype(int) - 1
 
-                self._data[_feature.name] = _feature
+                self._data[feature.name] = feature
         
         # Naming the new dataframe (with column names)
         ## Already done since the dataframe is composed of pandas series (with names)
@@ -97,17 +98,18 @@ class MrmreData:
         ## Still need to figure out what it want to return
         ## Still what about the survival data? 
         feature_data = pd.DataFrame()
-        for i, _feature_type in self._feature_types.iteritems():
-            if _feature_type == self._feature_map['continuous']:
-                _feature = self._data.iloc[:, i]
-            elif _feature_type == self._feature_map['discrete']:
-                _feature = self._data.iloc[:, i] + 1
+        for i, feature_type in self._feature_types.iteritems():
+            if feature_type == self._feature_map['continuous']:
+                feature = self._data.iloc[:, i]
+            elif feature_type == self._feature_map['discrete']:
+                feature = self._data.iloc[:, i] + 1
             else:
                 continue
-            feature_data[_feature.name] = _feature
+            feature_data[feature.name] = _feature
         
         feature_data = feature_data.dropna()
         # Build the censored data (need to check again how filter used here)
+        # Here the time and event columns are not included 
         feature_data['censored'] = feature_data.apply(self._survBuild, axis = 1)
 
         return feature_data
@@ -128,12 +130,12 @@ class MrmreData:
         if not col_indices:
             col_indices = list(range(self.featureCount()))
 
-        _data = self.featureData().iloc[row_indices, col_indices]
-        _strata = pd.factorize(self.sampleStrata().iloc[row_indices], sort = True)
-        _weights = self.sampleWeights().iloc[row_indices]
-        _priors = self.priors()[col_indices, col_indices] if self.priors() else None
+        data = self.featureData().iloc[row_indices, col_indices]
+        strata = pd.factorize(self.sampleStrata().iloc[row_indices], sort = True)
+        weights = self.sampleWeights().iloc[row_indices]
+        priors = self.priors()[col_indices, col_indices] if self.priors() else None
 
-        return self.__init__(_data, _strata, _weights, _priors)
+        return self.__init__(data, strata, weights, priors)
 
 
     ## SampleCount
@@ -171,9 +173,9 @@ class MrmreData:
         :return:
         '''
         if not value:
-            _strata = self._strata
-            _strata.index = list(self._data.index.values)
-            return _strata
+            strata = self._strata
+            strata.index = list(self._data.index.values)
+            return strata
 
         else:
             if len(value) != self._data.shape[0]:
@@ -193,9 +195,9 @@ class MrmreData:
         :return:
         '''
         if not value:
-            _weights = self._weights
-            _weights.index = list(self._data.index.values)
-            return _weights
+            weights = self._weights
+            weights.index = list(self._data.index.values)
+            return weights
         else:
             if value.size != self._data.shape[0]:
                 raise Exception('Data and weight must contain the same number of samples')
@@ -232,7 +234,7 @@ class MrmreData:
         '''
         call the export_mim cpp function
         '''
-        _mi_matrix = np.empty([self._data.shape[1], self._data.shape[1]])
+        mi_matrix = np.empty([self._data.shape[1], self._data.shape[1]])
         ######################
         ## Need to convert all 2d arrays to 1d ??
         ######################
@@ -248,11 +250,11 @@ class MrmreData:
                         self._estimator_map[continuous_estimator], 
                         int(outX == true), 
                         bootstrap_count, 
-                        _mi_matrix.flatten())
+                        mi_matrix.flatten())
         
-        _mi_matrix = self._compressFeatureMatrix(_mi_matrix)
+        mi_matrix = self._compressFeatureMatrix(mi_matrix)
         
-        return _mi_matrix
+        return mi_matrix
 
     ## Helper function to build censored data
     def _survBuild(self, row):
