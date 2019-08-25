@@ -4,9 +4,9 @@ import math
 from src.expt import export_mim
 from src.expt import export_filters
 from constants import *
-import rpy2.robjects as robjects
-from rpy2.robjects.packages import importr
-from rpy2.robjects import pandas2ri
+#import rpy2.robjects as robjects
+#from rpy2.robjects.packages import importr
+#from rpy2.robjects import pandas2ri
 
 class MrmreData:
   
@@ -17,58 +17,65 @@ class MrmreData:
                  priors : np.array = None):
 
         # Import the necessary r libraries needed for mRMRe
-        self.survival = importr('survival')
 
         ## Declare the private or protected variables here
         self._data           = pd.DataFrame()
         self._feature_types  = pd.Series()
         self._strata         = pd.Series()
         self._weights        = pd.Series()
-        self._priors         = np.array()
+        self._priors         = np.array([])
         self._sample_names   = list()
         self._feature_names  = list()
-        self._estimator_map = {'pearson'  : constants.ESTIMATOR.PEARSON, 
-                               'spearman' : constants.ESTIMATOR.SPEARMAN, 
-                               'kendall'  : constants.ESTIMATOR.KENDALL,
-                               'frequency': constants.ESTIMATOR.FREQUENCY}
+        self._estimator_map = {'pearson'  : ESTIMATOR.PEARSON, 
+                               'spearman' : ESTIMATOR.SPEARMAN, 
+                               'kendall'  : ESTIMATOR.KENDALL,
+                               'frequency': ESTIMATOR.FREQUENCY}
 
-        self._features_map = {'continuous': constants.FEATURE.CONTINUOUS,
-                              'discrete'  : constants.FEATURE.DISCRETE,
-                              'time'      : constants.FEATURE.TIME,
-                              'event'     : constants.FEATURE.EVENT}
+        self._features_map = {'continuous': FEATURE.CONTINUOUS,
+                              'discrete'  : FEATURE.DISCRETE,
+                              'event'     : FEATURE.SURVIVAL_EVENT,
+                              'time'      : FEATURE.SURVIVAL_TIME}
 
         if not isinstance(data, pd.DataFrame):
             raise Exception('Data must be of type dataframe')
-        if data.shape[1] > (math.sqrt(2^31) - 1):
+        if data.shape[1] > (math.sqrt(2 ** 31 - 1)):
             raise Exception("Too many features, the number of features should be <= 46340")
  
+        ## But currently, all columns are Object value (string)
+        ## Hardcode: convert all columns except survival data
+        for column in data:
+            if column != 'event' or column != 'time':
+                data[column] = pd.to_numeric(data[column])
+
         # Define the feature types of the data
+        # The data converted from csv file mostly is string
         for _, col in data.iteritems():
             # Firstly check whether the feature is survival data (depends on the column names)
-            if col.name in ['time', 'event']:
-                self._feature_types = self._feature_types.append(pd.Series([self._feature_map[col.name]]))
+            if col.name in ['event', 'time']:
+                self._feature_types = self._feature_types.append(pd.Series([self._features_map[col.name]]))
                 continue
             
             # If not, check the feature is numeric data or categorical data (ordered-factor)
+            
             if np.issubdtype(col.dtype, np.number):
-                self._feature_types = self._feature_types.append(pd.Series([self._feature_map['continuous']]))
+                self._feature_types = self._feature_types.append(pd.Series([self._features_map['continuous']]))
             elif col.dtype.name == 'category':
-                self._feature_types = self._feature_types.append(pd.Series([self._feature_map['discrete']]))
+                self._feature_types = self._feature_types.append(pd.Series([self._features_map['discrete']]))
             else:
                 raise Exception("Wrong labels")
 
         self._sample_names = list(data.index.values)
-        self._feature_names = list(data.column.values)
+        self._feature_names = list(data.columns.values)
 
         # Build the mRMR data
         if self._feature_types.sum() == 0:
             self._data = data
         else:
             for i, feature_type in self._feature_types.iteritems():
-                if feature_type == self._feature_map['continuous']:
+                if feature_type == self._features_map['continuous']:
                     # With the column name
                     feature = pd.to_numeric(data.iloc[:, i])
-                elif feature_type in (self._feature_map['time'], self._feature_map['event']):
+                elif feature_type in (self._features_map['event'], self._features_map['time']):
                     feature = data.iloc[:, i]
                 else:
                     # Why minus one? Is the indexing problems between R and C++?
@@ -133,7 +140,7 @@ class MrmreData:
         data = self.featureData().iloc[row_indices, col_indices]
         strata = pd.factorize(self.sampleStrata().iloc[row_indices], sort = True)
         weights = self.sampleWeights().iloc[row_indices]
-        priors = self.priors()[col_indices, col_indices] if self.priors() else None
+        priors = self._priors()[col_indices, col_indices] if self._priors() else None
 
         return self.__init__(data, strata, weights, priors)
 
