@@ -36,6 +36,9 @@ class MrmreData:
                               'event'     : FEATURE.SURVIVAL_EVENT,
                               'time'      : FEATURE.SURVIVAL_TIME}
 
+        self._sample_names = list(data.index.values)
+        self._feature_names = list(data.columns.values)
+
         if not isinstance(data, pd.DataFrame):
             raise Exception('Data must be of type dataframe')
         if data.shape[1] > (math.sqrt(2 ** 31 - 1)):
@@ -64,33 +67,39 @@ class MrmreData:
             else:
                 raise Exception("Wrong labels")
 
-        self._sample_names = list(data.index.values)
-        self._feature_names = list(data.columns.values)
+        self._feature_types.index = self._feature_names
 
         # Build the mRMR data
         if self._feature_types.sum() == 0:
             self._data = data
         else:
             for i, feature_type in self._feature_types.iteritems():
+                
                 if feature_type == self._features_map['continuous']:
                     # With the column name
-                    feature = pd.to_numeric(data.iloc[:, i])
+                    feature = pd.to_numeric(data.loc[:, i])
                 elif feature_type in (self._features_map['event'], self._features_map['time']):
-                    feature = data.iloc[:, i]
+                    feature = data.loc[:, i]
+                    #print(feature)
                 else:
                     # Why minus one? Is the indexing problems between R and C++?
-                    feature = data.iloc[:, i].astype(int) - 1
+                    feature = data.loc[:, i].astype(int) - 1
 
+                #print(feature.name)
+                #print(feature)
                 self._data[feature.name] = feature
+                
         
         # Naming the new dataframe (with column names)
         ## Already done since the dataframe is composed of pandas series (with names)
 
         # Sample Stratum processing
         self._strata = strata if strata else pd.Series(np.zeros(data.shape[0]))
+        self._strata.index = self._sample_names
 
         # Sample Weight processing
         self._weights = weights if weights else pd.Series(np.ones(data.shape[0]))
+        self._weights.index = self._sample_names
 
         # Sample Feature Matrix Processing
         self._priors = priors
