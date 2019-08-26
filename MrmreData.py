@@ -173,7 +173,7 @@ class MrmreData:
         '''
         :return:
         '''
-        return len(self._feature_names)
+        return self._data.shape[1]
     
     ## featureNames
     def featureNames(self):
@@ -254,7 +254,7 @@ class MrmreData:
         ######################
         ## Need to convert all 2d arrays to 1d ??
         ######################
-        expt.export_mim(self._data.values.flatten(), 
+        export_mim(self._data.values.flatten(), 
                         self._priors.flatten(), 
                         prior_weight, 
                         self._strata.values.astype(int), 
