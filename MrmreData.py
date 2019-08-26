@@ -280,9 +280,16 @@ class MrmreData:
     # It seems like functions about feature matrix return array, but the functions about 
     # feature indices return pandas series ? Should still be array
 
+    ## There exists the problem that the adaptor returned is string
     def _expandFeatureMatrix(self, matrix):
         expanded_matrix = np.array()
-        adaptor = self._feature_types.index[self._feature_types != 3].tolist()
+        # Compute the adaptor
+        i, adaptor = 0, []
+        for _, item in self._feature_types.iteritems():
+            if item != 3:
+                adaptor.append(item)
+            i += 1
+            
         for i in range(len(adaptor)):
             col = np.array()
             for j in range(len(adaptor)): 
@@ -304,15 +311,24 @@ class MrmreData:
         
     ## Helper function to compress FeatureMatrix
     def _compressFeatureMatrix(self, matrix):
-        
-        adaptor = self._feature_types.index[self._feature_types != 3].tolist()
+       # Compute the adaptor
+        i, adaptor = 0, []
+        for _, item in self._feature_types.iteritems():
+            if item != 3:
+                adaptor.append(item)
+            i += 1
 
         return matrix[adaptor, adaptor]
 
     ## expandFeatureIndices
     def _expandFeatureIndices(self, indices):
         indices = list(indices)
-        adaptor = self._feature_types.index[self._feature_types == 3].tolist()
+        # Compute the adaptor
+        i, adaptor = 0, []
+        for _, item in self._feature_types.iteritems():
+            if item != 3:
+                adaptor.append(item)
+            i += 1
         if len(adaptor) > 0 and (indices >= adaptor).any():
             for i in range(len(indices)):
                 for j in range(len(adaptor)):
@@ -325,7 +341,13 @@ class MrmreData:
     ## compressFeatureIndices
     def _compressFeatureIndices(self, indices):
         indices = list(indices)
-        _adaptor = self._feature_types.index[self._feature_types == 3].tolist()
+        # Compute the adaptor
+        i, adaptor = 0, []
+        for _, item in self._feature_types.iteritems():
+            if item != 3:
+                adaptor.append(item)
+            i += 1
+
         # It's correct here
         if len(_adaptor) > 0:
             for i in range(len(indices)):
