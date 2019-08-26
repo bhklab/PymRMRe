@@ -1,7 +1,11 @@
 import numpy as np 
 import pandas as pd 
 import constants
-import expt
+#import expt
+from src.expt import export_filters
+from src.expt import export_mim
+from MrmreData import *
+from constants import *
 from scipy.special import comb
 
 class MrmreFilter:
@@ -9,30 +13,32 @@ class MrmreFilter:
     def __init__(self,
                  data : MrmreData = None,
                  prior_weight : float = None,
-                 target_indices : np.array = None,
-                 levels : np.array = None,
+                 target_indices : np.array = np.array([]),
+                 levels : np.array = np.array([]),
                  method : str = 'bootstrap',
                  continous_estimator : str = 'pearson',
                  outX : bool = True,
                  bootstrap_count : int = 0):
 
         ## Declare the private or protected variables here
-        self._estimator_map = {'pearson'  : constants.ESTIMATOR.PEARSON, 
-                               'spearman' : constants.ESTIMATOR.SPEARMAN, 
-                               'kendall'  : constants.ESTIMATOR.KENDALL,
-                               'frequency': constants.ESTIMATOR.FREQUENCY}
+        self._estimator_map = {'pearson'  : ESTIMATOR.PEARSON, 
+                               'spearman' : ESTIMATOR.SPEARMAN, 
+                               'kendall'  : ESTIMATOR.KENDALL,
+                               'frequency': ESTIMATOR.FREQUENCY}
         self._method = method
         self._continous_estimator = self._estimator_map[continous_estimator]
         self._filter = pd.Series()
         self._scores = pd.Series()
         self._causality_list = pd.Series()
-        self._feature_names = data._featureNames()
-        self._sample_names = data._sampleNames()
+        self._feature_names = data.featureNames()
+        self._sample_names = data.sampleNames()
 
-        if type(data) != 'mRMRe_data':
-            raise Exception('data must be of type mRMRe_data')
+        '''
+        if type(data) != 'MrmreData':
+            raise Exception('data must be of type MrmreData')
+        '''
         
-        if len(data._prior) != 0:
+        if data._priors and len(data._priors) != 0:
             if not prior_weight:
                 raise Exception('prior weight must be provided if there are priors')
             elif prior_weight < 0 or prior_weight > 1:
@@ -42,13 +48,13 @@ class MrmreFilter:
 
         ## Target processing
 
-        if any(x < 1 for x in target_indices) or any(x > data.featureCount() for x in target_indices):
-            raise Exception('target indices must only contain values ranging from 1 to the number of features in data')
+        if any(x < 0 for x in target_indices) or any(x > data.featureCount() - 1 for x in target_indices):
+            raise Exception('target indices must only contain values ranging from 0 to the number of features minus one in data')
         
         self._target_indices = target_indices.astype(int)
         ## Level processing
 
-        if not levels:
+        if len(levels) == 0:
             raise Exception('levels must be provided')
         
         self._levels = levels.astype(int)
@@ -68,7 +74,7 @@ class MrmreFilter:
             if np.prod(levels) - 1 > comb(data._featureCount - 1, len(levels)):
                 raise Exception('user cannot request for more solutions than is possible given the data set')
 
-            res = expt.export_filters(self._levels，
+            res = expt.export_filters(self._levels,
                                       data._data.values.flatten(),
                                       data._priors,
                                       prior_weight,
@@ -83,18 +89,6 @@ class MrmreFilter:
                                       int(outX == true),
                                       bootstrap_count,
                                       mi_matrix)
-            '''
-            Call the cpp functions 
-            '''
-
-            #result 
-        '''
-        elif method == 'bootstrap':
-            
-            #Call the cpp functions
-            
-            result 
-        '''
         else:
             raise Exception('Unrecognized method: use exhaustive or bootstrap')
 
