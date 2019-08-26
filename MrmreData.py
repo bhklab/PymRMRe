@@ -289,7 +289,7 @@ class MrmreData:
             if item != 3:
                 adaptor.append(item)
             i += 1
-            
+
         for i in range(len(adaptor)):
             col = np.array()
             for j in range(len(adaptor)): 
@@ -349,10 +349,10 @@ class MrmreData:
             i += 1
 
         # It's correct here
-        if len(_adaptor) > 0:
+        if len(adaptor) > 0:
             for i in range(len(indices)):
-                for j in range(len(_adaptor)):
-                    indices[i] -= (indices[i] >= _adaptor[j])
+                for j in range(len(adaptor)):
+                    indices[i] -= (indices[i] >= adaptor[j])
 
         return np.array(indices)
 
