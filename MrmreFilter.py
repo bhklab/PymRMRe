@@ -15,8 +15,8 @@ class MrmreFilter:
                  prior_weight : float = None,
                  target_indices : np.array = np.array([]),
                  levels : np.array = np.array([]),
-                 method : str = 'bootstrap',
-                 continous_estimator : str = 'pearson',
+                 method : str = 'exhaustive',
+                 continuous_estimator : str = 'pearson',
                  outX : bool = True,
                  bootstrap_count : int = 0):
 
@@ -26,7 +26,7 @@ class MrmreFilter:
                                'kendall'  : ESTIMATOR.KENDALL,
                                'frequency': ESTIMATOR.FREQUENCY}
         self._method = method
-        self._continous_estimator = self._estimator_map[continous_estimator]
+        self._continuous_estimator = self._estimator_map[continuous_estimator]
         self._filter = pd.Series()
         self._scores = pd.Series()
         self._causality_list = pd.Series()
@@ -65,30 +65,30 @@ class MrmreFilter:
         ## Filter; Mutual Information and Causality Matrix
         # Nan operation here ?
         #mi_matrix = np.empty([data._nrow, data._ncol])
-        mi_matrix = np.zeros(data._nrow, data._ncol)
-        mi_matrix.fill(np.nan)
+        mi_matrix = np.zeros((data.sampleCount(), data.featureCount()))
+        #mi_matrix.fill(np.nan)
 
         if method == 'exhaustive':
 
             ## Level processing
-            if np.prod(levels) - 1 > comb(data._featureCount - 1, len(levels)):
+            if np.prod(levels) - 1 > comb(data.featureCount() - 1, len(levels)):
                 raise Exception('user cannot request for more solutions than is possible given the data set')
 
-            res = expt.export_filters(self._levels,
+            res = export_filters(self._levels.astype(np.int32),
                                       data._data.values.flatten(),
                                       data._priors,
                                       prior_weight,
-                                      data._strata,
-                                      data._weights,
-                                      data._feature_types,
+                                      data._strata.values.astype(np.int32),
+                                      data._weights.values,
+                                      data._feature_types.values.astype(np.int32),
                                       data._data.shape[0],
                                       data._data.shape[1],
                                       len(data._strata.unique()),
-                                      target_indices,
-                                      self._estimator_map[continuous_estimator],
-                                      int(outX == true),
+                                      target_indices.astype(np.uint32),
+                                      self._continuous_estimator,
+                                      int(outX == True),
                                       bootstrap_count,
-                                      mi_matrix)
+                                      mi_matrix.astype(np.int32))
         else:
             raise Exception('Unrecognized method: use exhaustive or bootstrap')
 
@@ -126,7 +126,7 @@ class MrmreFilter:
         self._scores.index = target_indices
         
         # Build the mutual information matrix
-        self._mi_matrix = data._compressFeatureMatrix(mi_matrix.reshape(data._ncol, data._ncol))
+        self._mi_matrix = data._compressFeatureMatrix(mi_matrix.reshape(data.sampleCount(), data.featureCount()))
         
 
     def sampleCount(self):
