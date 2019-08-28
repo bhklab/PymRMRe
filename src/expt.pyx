@@ -4,6 +4,7 @@ import numpy as np
 cimport numpy as np 
 from libcpp.vector cimport vector
 from libcpp.pair cimport pair
+from libc.stdint cimport int32_t, int64_t
 
 np.import_array()
 
@@ -12,6 +13,10 @@ np.import_array()
 __version__ = '1.0.0'
 
 cdef extern from "exports.cpp":
+    # cdef fused int_type:
+    #    np.int32_t
+        #np.int64_t
+    
     cdef pair[vector[vector[int]], vector[vector[vector[double]]]] c_export_filters(const int* const childrenCountPerLevel, double* const dataMatrix, 
         double* const priorsMatrix, const double priorsWeight,
         const int* const sampleStrata, const double* const sampleWeights, const int* const featureTypes, const unsigned int sampleCount, 

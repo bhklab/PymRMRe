@@ -88,7 +88,7 @@ class MrmreFilter:
                                       self._continuous_estimator,
                                       int(outX == True),
                                       bootstrap_count,
-                                      mi_matrix.astype(np.int32))
+                                      mi_matrix.flatten())
         else:
             raise Exception('Unrecognized method: use exhaustive or bootstrap')
 
