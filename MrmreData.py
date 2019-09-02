@@ -287,7 +287,7 @@ class MrmreData:
         i, adaptor = 0, []
         for _, item in self._feature_types.iteritems():
             if item != 3:
-                adaptor.append(item)
+                adaptor.append(i)
             i += 1
 
         for i in range(len(adaptor)):
@@ -315,7 +315,7 @@ class MrmreData:
         i, adaptor = 0, []
         for _, item in self._feature_types.iteritems():
             if item != 3:
-                adaptor.append(item)
+                adaptor.append(i)
             i += 1
 
         return matrix[adaptor, adaptor]
@@ -327,7 +327,7 @@ class MrmreData:
         i, adaptor = 0, []
         for _, item in self._feature_types.iteritems():
             if item != 3:
-                adaptor.append(item)
+                adaptor.append(i)
             i += 1
         if len(adaptor) > 0 and (indices >= adaptor).any():
             for i in range(len(indices)):
@@ -345,7 +345,7 @@ class MrmreData:
         i, adaptor = 0, []
         for _, item in self._feature_types.iteritems():
             if item != 3:
-                adaptor.append(item)
+                adaptor.append(i)
             i += 1
 
         # It's correct here
