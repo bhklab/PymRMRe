@@ -1,5 +1,6 @@
 #include "Data.h"
 #include <sys/time.h>
+#include <iostream>
 
 Data::Data(double* const pData, Matrix const* const pPriorsMatrix, double const priorsWeight,
         unsigned int const sampleCount, unsigned int const featureCount,
@@ -19,14 +20,22 @@ Data::Data(double* const pData, Matrix const* const pPriorsMatrix, double const 
     for (unsigned int i = 0; i < mpDataMatrix->getColumnCount(); ++i)
         mpHasOrderCached[i] = false;
 
-    Math::placeStratificationData(mpSampleStrata, mpSampleWeights, mpMasterSampleIndicesPerStratum, 
+    Math::placeStratificationData(mpSampleStrata, mpSampleWeights, mpSampleIndicesPerStratum, 
             mpSampleCountPerStratum, mSampleStratumCount, sampleCount);
 
+    
+    //std::cout <<  mSampleStratumCount << std::endl;
     for (unsigned int i = 0; i < mSampleStratumCount; ++i)
     {
         mpMasterSampleIndicesPerStratum[i] = new unsigned int[mpSampleCountPerStratum[i]];
-        for (unsigned int j = 0; j < mpSampleCountPerStratum[i]; ++j)
+        //std::cout <<  i << " Hello Data i start?" << std::endl;
+        for (unsigned int j = 0; j < mpSampleCountPerStratum[i]; ++j) {
+            //std::cout <<  j << " Hello Data j start?" << std::endl;
             mpMasterSampleIndicesPerStratum[i][j] = mpSampleIndicesPerStratum[i][j];
+            //std::cout <<  j << " Hello Data j finish?" << std::endl;
+        
+        }
+        //std::cout <<  i << " Hello Data i finish?" << std::endl;
     }
 }
 
