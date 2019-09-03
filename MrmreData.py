@@ -329,12 +329,13 @@ class MrmreData:
             if item != 3:
                 adaptor.append(i)
             i += 1
+            
         if len(adaptor) > 0 and (indices >= adaptor).any():
-            for i in range(len(indices)):
+            for i, index in enumerate(indices):
                 for j in range(len(adaptor)):
                     # 0/1 Indexing problem? Why plus one here?
                     ## Does not matter
-                    indices[i] += (indices[i] >= (adaptor[j] - j + 1))
+                    indices[i] += (index >= (adaptor[j] - j + 1))
 
         return np.array(indices)
 
@@ -350,9 +351,8 @@ class MrmreData:
 
         # It's correct here
         if len(adaptor) > 0:
-            for i in range(len(indices)):
-                for j in range(len(adaptor)):
-                    indices[i] -= (indices[i] >= adaptor[j])
+            for i, index in enumerate(indices):
+                indices[i] -= len([j for j in adaptor if index >= j])
 
         return np.array(indices)
 
