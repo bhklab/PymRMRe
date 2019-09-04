@@ -60,7 +60,7 @@ class MrmreFilter:
         self._levels = levels.astype(int)
 
         # The index 0/1 problems?
-        target_indices = data._expandFeatureIndices(target_indices).astype(int) - 1
+        target_indices = data._expandFeatureIndices(target_indices + 1).astype(int)
 
         ## Filter; Mutual Information and Causality Matrix
         # Nan operation here ?
@@ -75,20 +75,20 @@ class MrmreFilter:
                 raise Exception('user cannot request for more solutions than is possible given the data set')
 
             res = export_filters(self._levels.astype(np.int32),
-                                      data._data.values.flatten(),
-                                      data._priors,
-                                      prior_weight,
-                                      data._strata.values.astype(np.int32),
-                                      data._weights.values,
-                                      data._feature_types.values.astype(np.int32),
-                                      data._data.shape[0],
-                                      data._data.shape[1],
-                                      len(data._strata.unique()),
-                                      target_indices.astype(np.uint32),
-                                      self._continuous_estimator,
-                                      int(outX == True),
-                                      bootstrap_count,
-                                      mi_matrix.flatten())
+                                 data._data.values.flatten(),
+                                 data._priors,
+                                 prior_weight,
+                                 data._strata.values.astype(np.int32),
+                                 data._weights.values,
+                                 data._feature_types.values.astype(np.int32),
+                                 data._data.shape[0],
+                                 data._data.shape[1],
+                                 len(data._strata.unique()),
+                                 target_indices.astype(np.uint32),
+                                 self._continuous_estimator,
+                                 int(outX == True),
+                                 bootstrap_count,
+                                 mi_matrix.flatten())
         else:
             raise Exception('Unrecognized method: use exhaustive or bootstrap')
 

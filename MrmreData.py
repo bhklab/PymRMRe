@@ -324,26 +324,24 @@ class MrmreData:
     def _expandFeatureIndices(self, indices):
         indices = list(indices)
         # Compute the adaptor
-        i, adaptor = 0, []
+        i, adaptor = 1, []
         for _, item in self._feature_types.iteritems():
             if item != 3:
                 adaptor.append(i)
             i += 1
             
-        if len(adaptor) > 0 and (indices >= adaptor).any():
+        if len(adaptor) > 0:
             for i, index in enumerate(indices):
                 for j in range(len(adaptor)):
-                    # 0/1 Indexing problem? Why plus one here?
-                    ## Does not matter
-                    indices[i] += (index >= (adaptor[j] - j + 1))
-
+                    indices[i] += (index >= (adaptor[j] - j))
+        
         return np.array(indices)
 
     ## compressFeatureIndices
     def _compressFeatureIndices(self, indices):
         indices = list(indices)
         # Compute the adaptor
-        i, adaptor = 0, []
+        i, adaptor = 1, []
         for _, item in self._feature_types.iteritems():
             if item != 3:
                 adaptor.append(i)
