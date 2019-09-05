@@ -282,32 +282,28 @@ class MrmreData:
 
     ## There exists the problem that the adaptor returned is string
     def _expandFeatureMatrix(self, matrix):
-        expanded_matrix = np.array()
+        expanded_matrix, adaptor = [], []
         # Compute the adaptor
-        i, adaptor = 0, []
+        i = 0
         for _, item in self._feature_types.iteritems():
             if item != 3:
                 adaptor.append(i)
             i += 1
 
         for i in range(len(adaptor)):
-            col = np.array()
+            col = []
             for j in range(len(adaptor)): 
-                # Row binding 
+            # Row binding 
                 item = matrix[adaptor[j]][adaptor[i]]
-                if self._feature_types[adaptor[j]] == 2:
-                    col = np.vstack((col, item))
-                    col = np.vstack((col, item))
-                else:
-                    col = np.vstack((col, item))
+                if self._feature_types.iloc[adaptor[j]] == 2:
+                    col.append(item)     # Extra prior for Surv object
+                col.append(item)
             # Column binding
-            if self._feature_types[adaptor[i]] == 2:
-                expanded_matrix = np.hstack((expanded_matrix, col))
-                expanded_matrix = np.hstack((expanded_matrix, col))
-            else:
-                expanded_matrix = np.hstack((expanded_matrix, col))
+            if self._feature_types.iloc[adaptor[i]] == 2:
+                expanded_matrix.append(col)
+            expanded_matrix.append(col)
 
-        return expanded_matrix
+        return np.array(expanded_matrix).T
         
     ## Helper function to compress FeatureMatrix
     def _compressFeatureMatrix(self, matrix):
