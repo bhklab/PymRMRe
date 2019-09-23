@@ -101,28 +101,31 @@ class MrmreFilter:
         scores = res[1][1]              # List<List<float>>
         
         # Build the filter based on solutions
-        for i, sol in enumerate(solutions):
-            sol_matrix = data._compressFeatureIndices(sol + 1).reshape(len(self._levels), np.prod(self._levels))
-            #self._filter.set(target_indices[i], [sol_matrix]) # Also set the index 
-            self._filter = self._filter.append(pd.Series([sol_matrix]))
+        _solutions = []
+        for sol in solutions:
+            _sol = data._compressFeatureIndices(sol + 1).reshape(len(self._levels), np.prod(self._levels))
+            _solutions.append(_sol)
         
+        self._filter = pd.Series(_solutions)
         self._filter.index = target_indices
         
         # Build the causality list
-        _, cols_unique = np.unique(data._compressFeatureIndices(list(range(data._ncol))), return_index=true)
-        for i, causality_array in enumerate(causality_list):
-            causality_array = causality_array[cols_unique]
-            #self._causality_list.set(target_indices[i], [causality_array])
-            self._causality_list = self._causality_list.append(pd.Series([causality_array]))
+        _causality_list = []
+        _, unique_indices = np.unique(data._compressFeatureIndices(list(range(data.sampleCount())), return_index = True))
+        for cas in causality_list:
+            _cas = cas[unique_indices]
+            _causality_list.append(_cas)
         
+        self._causality_list = pd.Series(_causality_list)
         self._causality_list.index = target_indices
 
         # Build the scores matrix
-        for i, score in enumerate(scores):
-            sc_matrix = score.reshape(len(self._levels), np.prod(self._levels))
-            #self._scores.set(target_indices[i], [sc_matrix])
-            self._scores = self._scores.append(pd.Series([sc_matrix]))
-
+        _scores = []
+        for sc in scores:
+            _sc = sc.reshape(len(self._levels), np.prod(self._levels))
+            _scores.append(_sc)
+        
+        self._scores = pd.Series(_scores)
         self._scores.index = target_indices
         
         # Build the mutual information matrix
