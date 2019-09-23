@@ -154,24 +154,24 @@ class MrmreFilter:
         # filters[target][solution, ] is a vector of selected features
         # in a solution for a target; missing values denote removed features
         ## One question is why we need the string here?
-        filters = pd.Series()
-        target_indices = self._target_indices
+        _filters = []
         for target_index in self._target_indices:
-            result_matrix = self._filters.loc[[target_index]]
-            causality_dropped, _ = np.where(self._causality_list.loc[[target_index]] > causality_threshold)
+            result_matrix = self._filters.loc[target_index]
+            causality_dropped, _ = np.where(np.array(self._causality_list.loc[target_index]) > causality_threshold)
             mi_dropped, _ = np.where(-.5 * np.log(1 - np.square(self._mi_matrix[:, target_index])) < mi_threshold)
-             
-            # Apply the Nan operation here
-            for idx in set(list(causality_dropped) + list(mi_dropped)):
-                i, j = idx % result_matrix.shape[0], idx // result_matrix.shape[0]
-                result_matrix[i][j] = np.nan 
-    
+            # Nan operation
+            dropped = set(list(causality_dropped) + list(mi_dropped))
+            for i, result in enumerate(result_matrix):
+                if result in dropped:
+                    result_matrix[i] = np.nan
+            
             pre_return_matrix = np.flip(result_matrix, axis = 0)
-            filters = filters.append(pd.Series([pre_return_matrix]))
+            _filters.append(pre_return_matrix)
         
-        filters.index = target_indices
+        _filters = pd.Series(_filters)
+        _filters.index = self._target_indices
 
-        return filters
+        return _filters
 
     def _scores(self):
         mi_matrix = self.mim()
