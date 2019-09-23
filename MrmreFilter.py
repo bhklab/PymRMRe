@@ -51,6 +51,8 @@ class MrmreFilter:
         if any(x < 0 for x in target_indices) or any(x > data.featureCount() - 1 for x in target_indices):
             raise Exception('target indices must only contain values ranging from 0 to the number of features minus one in data')
         
+        # This is because sometimes we accept the column names as inputs (the feature names)
+        # But I will process this before
         self._target_indices = target_indices.astype(int)
         ## Level processing
 
@@ -96,17 +98,17 @@ class MrmreFilter:
         ## After building the result, result is the data structure of Result defind in exports.h
         ## The returned filter is object of list
         ## The returned filter need to use target lists as name
-        solutions = res[0]              # List<List<int>>
+        filters = res[0]              # List<List<int>>
         causality_list = res[1][0]      # List<List<float>>
         scores = res[1][1]              # List<List<float>>
         
         # Build the filter based on solutions
-        _solutions = []
-        for sol in solutions:
+        _filters = []
+        for sol in filters:
             _sol = data._compressFeatureIndices(sol + 1).reshape(len(self._levels), np.prod(self._levels))
-            _solutions.append(_sol)
+            _filters.append(_sol)
         
-        self._filter = pd.Series(_solutions)
+        self._filter = pd.Series(_filters)
         self._filter.index = target_indices
         
         # Build the causality list
