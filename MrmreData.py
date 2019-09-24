@@ -16,7 +16,6 @@ class MrmreData:
                  weights : pd.Series = None,
                  priors : np.array = None):
 
-        # Import the necessary r libraries needed for mRMRe
 
         ## Declare the private or protected variables here
         self._data           = pd.DataFrame()
@@ -26,15 +25,7 @@ class MrmreData:
         self._priors         = np.array([])
         self._sample_names   = list()
         self._feature_names  = list()
-        self._estimator_map = {'pearson'  : ESTIMATOR.PEARSON, 
-                               'spearman' : ESTIMATOR.SPEARMAN, 
-                               'kendall'  : ESTIMATOR.KENDALL,
-                               'frequency': ESTIMATOR.FREQUENCY}
-
-        self._features_map = {'continuous': FEATURE.CONTINUOUS,
-                              'discrete'  : FEATURE.DISCRETE,
-                              'event'     : FEATURE.SURVIVAL_EVENT,
-                              'time'      : FEATURE.SURVIVAL_TIME}
+        
 
         self._sample_names = list(data.index.values)
         self._feature_names = list(data.columns.values)
@@ -44,54 +35,33 @@ class MrmreData:
         if data.shape[1] > (math.sqrt(2 ** 31 - 1)):
             raise Exception("Too many features, the number of features should be <= 46340")
  
-        ## But currently, all columns are Object value (string)
-        ## Hardcode: convert all columns except survival data
-        for column in data:
-            if column != 'event' or column != 'time':
-                data[column] = pd.to_numeric(data[column])
-
-        # Define the feature types of the data
-        # The data converted from csv file mostly is string
-        for _, col in data.iteritems():
-            # Firstly check whether the feature is survival data (depends on the column names)
-            if col.name in ['event', 'time']:
-                self._feature_types = self._feature_types.append(pd.Series([self._features_map[col.name]]))
-                continue
-            
-            # If not, check the feature is numeric data or categorical data (ordered-factor)
-            
-            if np.issubdtype(col.dtype, np.number):
-                self._feature_types = self._feature_types.append(pd.Series([self._features_map['continuous']]))
-            elif col.dtype.name == 'category':
-                self._feature_types = self._feature_types.append(pd.Series([self._features_map['discrete']]))
+        # Build the feature types
+        _feature_types = []
+        _feature_names = list(range(features.shape[1]))
+        for col in data:
+            if col in ['time', 'event']:
+                _feature_types.append(MAP.features_map[col])
+            elif data.loc[:, col].dtype.name == 'category':
+                _feature_types.append(MAP.features_map['discrete'])
             else:
-                raise Exception("Wrong labels")
+                _feature_types.append(MAP.features_map['continuous'])
 
-        self._feature_types.index = self._feature_names
+        self._feature_types = pd.Series(_feature_types)
+        self._feature_types.index = _feature_names
 
+        
         # Build the mRMR data
         if self._feature_types.sum() == 0:
             self._data = data
         else:
-            for i, feature_type in self._feature_types.iteritems():
-                
-                if feature_type == self._features_map['continuous']:
-                    # With the column name
-                    feature = pd.to_numeric(data.loc[:, i])
-                elif feature_type in (self._features_map['event'], self._features_map['time']):
-                    feature = data.loc[:, i]
-                    #print(feature)
-                else:
-                    # Why minus one? Is the indexing problems between R and C++?
-                    feature = data.loc[:, i].astype(int) - 1
+            for i, col in enumerate(data):
+                if feature_types[i] == MAP.features_map['continuous']:
+                    self._data[col] = data.loc[:, col]
+                elif feature_types[i] == MAP.features_map['discrete']:
+                    self._data[col] = data.loc[:, col].astype(int) - 1
+                elif col == 'time' or col == 'event':    # Should be fine here
+                    self._data[col] = data.loc[:, col]
 
-                #print(feature.name)
-                #print(feature)
-                self._data[feature.name] = feature
-                
-        
-        # Naming the new dataframe (with column names)
-        ## Already done since the dataframe is composed of pandas series (with names)
 
         # Sample Stratum processing
         self._strata = strata if strata else pd.Series(np.zeros(data.shape[0]))
@@ -104,7 +74,6 @@ class MrmreData:
         # Sample Feature Matrix Processing
         self._priors = priors
 
-        # No explictly return in __init__ function
 
     def featureData(self):
         '''
