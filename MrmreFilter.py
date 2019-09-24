@@ -76,7 +76,7 @@ class MrmreFilter:
                 raise Exception('user cannot request for more solutions than is possible given the data set')
 
             res = export_filters(self._levels.astype(np.int32),
-                                 data._data.values.flatten(),
+                                 data._data.values.flatten('F'),
                                  data._priors,
                                  prior_weight,
                                  data._strata.values.astype(np.int32),
@@ -89,7 +89,7 @@ class MrmreFilter:
                                  self._continuous_estimator,
                                  int(outX == True),
                                  bootstrap_count,
-                                 mi_matrix.flatten())
+                                 mi_matrix.flatten('F'))
         else:
             raise Exception('Unrecognized method: use exhaustive or bootstrap')
 
