@@ -151,9 +151,8 @@ class MrmreFilter:
         return data._feature_names
 
     def _solutions(self, mi_threshold = -float('inf'), causality_threshold = float('inf')):
-        # filters[target][solution, ] is a vector of selected features
-        # in a solution for a target; missing values denote removed features
-        ## One question is why we need the string here?
+        ## filters[target][solution, ] is a vector of selected features
+        ## in a solution for a target; missing values denote removed features
         _filters = []
         for target_index in self._target_indices:
             result_matrix = self._filters.loc[target_index]
