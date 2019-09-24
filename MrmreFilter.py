@@ -65,10 +65,9 @@ class MrmreFilter:
         target_indices = data._expandFeatureIndices(target_indices + 1).astype(int)
 
         ## Filter; Mutual Information and Causality Matrix
-        # Nan operation here ?
-        #mi_matrix = np.empty([data._nrow, data._ncol])
-        mi_matrix = np.zeros((data.sampleCount(), data.featureCount()))
-        #mi_matrix.fill(np.nan)
+        # Mutual Information matrix
+        mi_matrix = np.empty((data.sampleCount(), data.featureCount()))
+        mi_matrix[:] = np.nan
 
         if method == 'exhaustive':
 
