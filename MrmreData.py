@@ -37,7 +37,7 @@ class MrmreData:
  
         # Build the feature types
         _feature_types = []
-        _feature_names = list(range(features.shape[1]))
+        _feature_names = list(range(data.shape[1]))
         for col in data:
             if col in ['time', 'event']:
                 _feature_types.append(MAP.features_map[col])
@@ -319,7 +319,7 @@ class MrmreData:
 
         return np.array(indices)
 
-    def _scores(self, solutions):
+    def scores(self, solutions):
         '''
         Better develop that after the finish of mRMR.Filter class
         '''

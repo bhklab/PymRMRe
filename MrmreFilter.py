@@ -13,20 +13,16 @@ class MrmreFilter:
     def __init__(self,
                  data : MrmreData = None,
                  prior_weight : float = None,
-                 target_indices : np.array = np.array([]),
-                 levels : np.array = np.array([]),
+                 target_indices : list = [0],
+                 levels : list = [0],
                  method : str = 'exhaustive',
                  continuous_estimator : str = 'pearson',
                  outX : bool = True,
                  bootstrap_count : int = 0):
 
         ## Declare the private or protected variables here
-        self._estimator_map = {'pearson'  : ESTIMATOR.PEARSON, 
-                               'spearman' : ESTIMATOR.SPEARMAN, 
-                               'kendall'  : ESTIMATOR.KENDALL,
-                               'frequency': ESTIMATOR.FREQUENCY}
         self._method = method
-        self._continuous_estimator = self._estimator_map[continuous_estimator]
+        self._continuous_estimator = MAP.estimator_map[continuous_estimator]
         self._filter = pd.Series()
         self._scores = pd.Series()
         self._causality_list = pd.Series()
@@ -44,7 +40,7 @@ class MrmreFilter:
             elif prior_weight < 0 or prior_weight > 1:
                 raise Exception('prior weight must be a value ranging from 0 to 1')
         else:
-            prior_weight = 0
+            prior_weight = 0.0
 
         ## Target processing
 
@@ -53,21 +49,27 @@ class MrmreFilter:
         
         # This is because sometimes we accept the column names as inputs (the feature names)
         # But I will process this before
-        self._target_indices = target_indices.astype(int)
+        self._target_indices = np.array(target_indices).astype(int)
+        #self._target_indices = target_indices.astype(int)
         ## Level processing
 
         if len(levels) == 0:
             raise Exception('levels must be provided')
         
-        self._levels = levels.astype(int)
+        #self._levels = levels.astype(int)
+        self._levels = np.array(levels).astype(int)
 
         # The index 0/1 problems?
-        target_indices = data._expandFeatureIndices(target_indices + 1).astype(int)
+        target_indices = data._expandFeatureIndices(self._target_indices + 1).astype(int)
 
         ## Filter; Mutual Information and Causality Matrix
         # Mutual Information matrix
-        mi_matrix = np.empty((data.sampleCount(), data.featureCount()))
+        mi_matrix = np.empty((data.sampleCount(), data.featureCount())).astype(np.double)
         mi_matrix[:] = np.nan
+
+
+        ## Check the input data for debugging
+       
 
         if method == 'exhaustive':
 
@@ -77,7 +79,7 @@ class MrmreFilter:
 
             res = export_filters(self._levels.astype(np.int32),
                                  data._data.values.flatten('F'),
-                                 data._priors,
+                                 np.array([]),
                                  prior_weight,
                                  data._strata.values.astype(np.int32),
                                  data._weights.values,
@@ -85,11 +87,11 @@ class MrmreFilter:
                                  data._data.shape[0],
                                  data._data.shape[1],
                                  len(data._strata.unique()),
-                                 target_indices.astype(np.uint32),
+                                 self._target_indices.astype(np.uint32),
                                  self._continuous_estimator,
                                  int(outX == True),
                                  bootstrap_count,
-                                 mi_matrix.flatten('F'))
+                                 mi_matrix.flatten())
         else:
             raise Exception('Unrecognized method: use exhaustive or bootstrap')
 
@@ -100,6 +102,10 @@ class MrmreFilter:
         filters = res[0]              # List<List<int>>
         causality_list = res[1][0]      # List<List<float>>
         scores = res[1][1]              # List<List<float>>
+
+        print(filters)
+        print(causality_list)
+        print(scores)
         
         # Build the filter based on solutions
         _filters = []
@@ -131,6 +137,7 @@ class MrmreFilter:
         
         # Build the mutual information matrix
         self._mi_matrix = data._compressFeatureMatrix(mi_matrix.reshape(data.sampleCount(), data.featureCount()))
+        print(self._mi_matrix)
         
 
     def sampleCount(self):
@@ -149,7 +156,7 @@ class MrmreFilter:
 
         return data._feature_names
 
-    def _solutions(self, mi_threshold = -float('inf'), causality_threshold = float('inf')):
+    def solutions(self, mi_threshold = -float('inf'), causality_threshold = float('inf')):
         ## filters[target][solution, ] is a vector of selected features
         ## in a solution for a target; missing values denote removed features
         _filters = []
@@ -171,7 +178,7 @@ class MrmreFilter:
 
         return _filters
 
-    def _scores(self):
+    def scores(self):
         mi_matrix = self.mim()
         target_indices = self._target_indices
         scores = pd.Series()
