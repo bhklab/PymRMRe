@@ -7,12 +7,30 @@ from MrmreFilter import *
 
 def mrmr_selection(features : pd.DataFrame,
                    target_features : list,
+                   features_types : list,
                    target_count : int,
                    solution_count : int = 1,
                    fixed_selected_count : int = 0,
                    method : str = 'exhaustive',
                    estimator : str = 'pearson',
                    survival : bool = False):
+
+    ## Handle some corner cases
+    # The input features type
+    if len(features_types) != features.shape[1]:
+        raise Exception('The count of feature types does not match with the size of dataset')
+    
+    if any((x < 0 or x > 3) for x in features_types):
+        raise Exception('The feature type should within the range 0, 1, 2, 3')
+    
+    # The method and estimator do not match
+    if method not in ["exhaustive", "bootstrap"]:
+        raise Exception('The method must be exhaustive or bootstrap')
+    
+    if estimator not in ["pearson", "spearman", "kendall", "frequency"]:
+        raise Exception("The continuous estimator must be chosen from pearson, spearman, kendall and frequency")
+
+    
     # No need for data pre-processing, since the data frame input is already the combined version
     if not survival:
         features['time'] = features['target']
@@ -22,8 +40,10 @@ def mrmr_selection(features : pd.DataFrame,
     features = features.infer_objects()
 
     # Build the mRMR data
-    mrmr_data = MrmreData(data = features)
+    mrmr_data = MrmreData(data = features, 
+                          features_types = features_types)
 
+    ## Here the 
     # Find the target indices and fixed features selected
     target_indices = []
     for tf in target_features:
@@ -33,12 +53,12 @@ def mrmr_selection(features : pd.DataFrame,
     
     # Build the mRMR Filter
     levels = [solution_count] + [1] * target_count
-    mrmr_filter = MrmreFilter(data = mrmr_data, target_indices = target_indices, fixed_selected_count = fixed_selected_count,
+    mrmr_filter = MrmreFilter(data = mrmr_data, 
+                              target_indices = target_indices, 
+                              fixed_selected_count = fixed_selected_count,
                               levels = levels)
     
     return mrmr_filter._filter
-
-
 
 def mrmr_selection_with_clinical(target_df : pd.DataFrame,
                    features_df : pd.DataFrame,
