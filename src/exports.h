@@ -12,10 +12,14 @@
 
 using namespace std;
 
+// Need to add the size of level vector (actually just the feature count per solution)
+
 std::pair <vector<vector<int> >, vector<vector<vector<double> > > >
 c_export_filters(const int * const childrenCountPerLevel, 
+                const unsigned int levelCount,
                 double* const dataMatrix, 
                 double* const priorsMatrix, 
+                const unsigned int priorsCount,
                 const double priorsWeight,
                 const int* const sampleStrata, 
                 const double* const sampleWeights, 
@@ -24,10 +28,11 @@ c_export_filters(const int * const childrenCountPerLevel,
                 const unsigned int featureCount, 
                 const unsigned int sampleStratumCount, 
                 unsigned int* targetFeatureIndices, 
+                const unsigned int targetCount,
                 const unsigned int continuousEstimator, 
                 const unsigned int outX, 
                 const unsigned int bootstrapCount, 
-                const double* miMatrix);
+                double* const miMatrix);
         // priorsMatrix is array? Instead of matrix? 
         // dataMatrix is array? Instead of matrix?
         // FeatureCount is array? Instead of integer? 

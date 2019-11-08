@@ -9,8 +9,10 @@ using namespace std;
 
 std::pair <vector<vector<int> >, vector<vector<vector<double> > > >
 c_export_filters(const int * const childrenCountPerLevel, 
+                const unsigned int levelCount,
                 double* const dataMatrix, 
                 double* const priorsMatrix, 
+                const unsigned int priorsCount,
                 const double priorsWeight,
                 const int* const sampleStrata, 
                 const double* const sampleWeights, 
@@ -19,26 +21,27 @@ c_export_filters(const int * const childrenCountPerLevel,
                 const unsigned int featureCount, 
                 const unsigned int sampleStratumCount, 
                 unsigned int* targetFeatureIndices, 
+                const unsigned int targetCount,
                 const unsigned int continuousEstimator, 
                 const unsigned int outX, 
                 const unsigned int bootstrapCount, 
                 double* const miMatrix)
 {
     Matrix const priors_matrix(priorsMatrix, featureCount, featureCount);
-
+    
     Matrix const* const p_priors_matrix = 
-            (sizeof(priorsMatrix) / sizeof(priorsMatrix[0])) == featureCount * featureCount ? &priors_matrix : 0;
-
+            priorsCount == featureCount * featureCount ? &priors_matrix : 0;
+    
     Data data(dataMatrix, p_priors_matrix, priorsWeight, sampleCount, featureCount, sampleStrata, sampleWeights,
             featureTypes, sampleStratumCount, continuousEstimator, outX != 0, bootstrapCount);
-
+    
     MutualInformationMatrix mi_matrix(&data, miMatrix);
 
     unsigned int solution_count = 1;
-    for (unsigned int i = 0; i < sizeof(childrenCountPerLevel) / sizeof(childrenCountPerLevel[0]); ++i)
+    for (unsigned int i = 0; i < levelCount; ++i)
         solution_count *= childrenCountPerLevel[i];
     
-    unsigned int const feature_count_per_solution = sizeof(childrenCountPerLevel) / sizeof(childrenCountPerLevel[0]);
+    unsigned int const feature_count_per_solution = levelCount;
     unsigned int const chunk_size = solution_count * feature_count_per_solution;
     
     // Return value
@@ -48,29 +51,22 @@ c_export_filters(const int * const childrenCountPerLevel,
 
     expt.push_back(causality);
     expt.push_back(scores);
-    // SET_VECTOR_ELT about the result
-    int targetFeatureLength = sizeof(targetFeatureIndices) / sizeof(targetFeatureIndices[0]);
-    
+
+    int targetFeatureLength = targetCount;
+
 
     for (unsigned int i = 0; i < targetFeatureLength; ++i)
     {   
         // Build new vector
         vector<int> solutions_i;
         vector<double> casuality_i, scores_i;
-        solutions.push_back(solutions_i);
-        expt[0].push_back(casuality_i);
-        expt[1].push_back(scores_i);
 
-        Filter filter(childrenCountPerLevel, sizeof(childrenCountPerLevel) / sizeof(childrenCountPerLevel[0]), &mi_matrix, targetFeatureIndices[i]);
+        Filter filter(childrenCountPerLevel, levelCount, &mi_matrix, targetFeatureIndices[i]);
         filter.build();
         
         int* sol = new int[chunk_size];
         double* cas = new double[featureCount];
         double* sc = new double[chunk_size];
-        /* 
-        solutions.push_back(sol);
-        expt[0].push_back(cas);
-        expt[1].push_back(sc); */
 
         filter.getSolutions(sol);
         filter.getScores(sc);
@@ -81,15 +77,17 @@ c_export_filters(const int * const childrenCountPerLevel,
         Math::computeCausality(cas, &mi_matrix, sol, solution_count,
                 feature_count_per_solution, featureCount, targetFeatureIndices[i]);
 
-        // After computing the solutions, casuality and scores
-        // Put the results in the vectors
         for (unsigned int k = 0; k < chunk_size; ++k) {
-            solutions[i].push_back(sol[k]);
-            expt[1][i].push_back(sc[k]);
+            solutions_i.push_back(sol[k]);
+            scores_i.push_back(sc[k]);
         }
         for (unsigned int k = 0; k < featureCount; ++k) 
-            expt[0][i].push_back(cas[i]);
+            casuality_i.push_back(cas[i]);
 
+        solutions.push_back(solutions_i);
+        expt[0].push_back(casuality_i);
+        expt[1].push_back(scores_i);
+        
         delete[] sol;
         delete[] cas;
         delete[] sc;
@@ -190,7 +188,7 @@ c_export_mim(double* const dataMatrix,
 {
     Matrix const priors_matrix(priorsMatrix, featureCount, featureCount);
     Matrix const* const p_priors_matrix = 
-            (sizeof(priorsMatrix) / sizeof(priorsMatrix[0])) == featureCount * featureCount ? &priors_matrix : 0;
+            (40000) == featureCount * featureCount ? &priors_matrix : 0;
     Data data(dataMatrix, p_priors_matrix, priorsWeight, sampleCount, featureCount, sampleStrata, sampleWeights,
             featureTypes, sampleStratumCount, continuousEstimator, outX != 0, bootstrapCount);
     MutualInformationMatrix mi_matrix(&data, miMatrix);
