@@ -25,13 +25,15 @@ private:
     unsigned int const mLevelCount;
     Matrix* const mpFeatureInformationMatrix;
     unsigned int* const mpStartingIndexPerLevel;
+    unsigned int const mFixedFeatureCount;
     unsigned int* mpIndexTree;
     double* mpScoreTree;
     unsigned int mTreeElementCount;
 
 public:
     Filter(int const* const pChildrenCountPerLevel, unsigned int const levelCount,
-            Matrix* const pFeatureInformationMatrix, unsigned int const targetFeatureIndex);
+            Matrix* const pFeatureInformationMatrix, unsigned int const targetFeatureIndex,
+            unsigned int const fixedFeatureCount);
     
     ~Filter();
 
