@@ -21,6 +21,7 @@ c_export_filters(const int * const childrenCountPerLevel,
                 const unsigned int featureCount, 
                 const unsigned int sampleStratumCount, 
                 unsigned int* targetFeatureIndices, 
+                const unsigned int fixedFeatureCount,
                 const unsigned int targetCount,
                 const unsigned int continuousEstimator, 
                 const unsigned int outX, 
@@ -61,7 +62,7 @@ c_export_filters(const int * const childrenCountPerLevel,
         vector<int> solutions_i;
         vector<double> casuality_i, scores_i;
 
-        Filter filter(childrenCountPerLevel, levelCount, &mi_matrix, targetFeatureIndices[i]);
+        Filter filter(childrenCountPerLevel, levelCount, &mi_matrix, targetFeatureIndices[i], fixedFeatureCount);
         filter.build();
         
         int* sol = new int[chunk_size];
