@@ -118,7 +118,8 @@ class MrmreFilter:
         # Build the filter based on solutions
         _filters = []
         for sol in filters:
-            _sol = data._compressFeatureIndices(np.array(sol) + 1).reshape(len(self._levels), np.prod(self._levels))
+            _sol = data._compressFeatureIndices(np.array(sol) + 1).reshape(np.prod(self._levels), len(self._levels)) - 1
+            _sol = _sol.T
             _filters.append(_sol)
         
         self._filters = pd.Series(_filters)
@@ -128,7 +129,7 @@ class MrmreFilter:
         ## Different from the above, the list is different from the array
 
         _causality_list = []
-        _, unique_indices = np.unique(data._compressFeatureIndices(list(range(data.sampleCount()))), return_index = True)
+        _, unique_indices = np.unique(data._compressFeatureIndices(list(range(data.featureCount()))), return_index = True)
         for cas in causality_list:
             _cas = np.array(cas)[unique_indices]
             _causality_list.append(_cas)
@@ -140,7 +141,8 @@ class MrmreFilter:
         ## Different from the above, the list is different from the array
         _scores = []
         for sc in scores:
-            _sc = np.array(sc).reshape(len(self._levels), np.prod(self._levels))
+            _sc = np.array(sc).reshape(np.prod(self._levels), len(self._levels))
+            _sc = _sc.T
             _scores.append(_sc)
 
         self._scores = pd.Series(_scores)
