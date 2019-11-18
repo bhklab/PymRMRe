@@ -4,17 +4,15 @@ import math
 from src.expt import export_mim
 from src.expt import export_filters
 from constants import *
-#import rpy2.robjects as robjects
-#from rpy2.robjects.packages import importr
-#from rpy2.robjects import pandas2ri
 
 class MrmreData:
   
     def __init__(self,
                  data : pd.DataFrame = None,
+                 feature_types : list = [],
                  strata : pd.Series = None,
                  weights : pd.Series = None,
-                 priors : np.array = None):
+                 priors : np.array = np.array([])):
 
 
         ## Declare the private or protected variables here
@@ -36,6 +34,11 @@ class MrmreData:
             raise Exception("Too many features, the number of features should be <= 46340")
  
         # Build the feature types
+        ## This part will be modified, since we force the features types as one input
+        self._feature_types = pd.Series(feature_types)
+        self._feature_types.index = list(range(data.shape[1]))
+        
+        '''
         _feature_types = []
         _feature_names = list(range(data.shape[1]))
         for col in data:
@@ -48,20 +51,40 @@ class MrmreData:
 
         self._feature_types = pd.Series(_feature_types)
         self._feature_types.index = _feature_names
+        '''
+        
+        ## Build the mRMR data
 
         
-        # Build the mRMR data
         if self._feature_types.sum() == 0:
             self._data = data
         else:
             for i, col in enumerate(data):
-                if feature_types[i] == MAP.features_map['continuous']:
+                '''
+                if self._feature_types[i] == 0:       # Continuous
+                    self._data[col] = data.loc[:, col] '''
+                if self._feature_types[i] == 1:     # Factor variables
+                    self._data[col] = data.loc[:, col].astype(int) - 1
+                else:  # Do we need to handle the feature type?
                     self._data[col] = data.loc[:, col]
-                elif feature_types[i] == MAP.features_map['discrete']:
+        
+        
+        #print(self._data)
+        #print(self._feature_types)
+        # Need to guarantee the event must be ahead of the time
+        '''
+
+        if self._feature_types.sum() == 0:
+            self._data = data
+        else:
+            for i, col in enumerate(data):
+                if self._feature_types[i] == MAP.features_map['continuous']:
+                    self._data[col] = data.loc[:, col]
+                elif self._feature_types[i] == MAP.features_map['discrete']:
                     self._data[col] = data.loc[:, col].astype(int) - 1
                 elif col == 'time' or col == 'event':    # Should be fine here
                     self._data[col] = data.loc[:, col]
-
+        '''
 
         # Sample Stratum processing
         self._strata = strata if strata else pd.Series(np.zeros(data.shape[0]))
@@ -74,7 +97,8 @@ class MrmreData:
         # Sample Feature Matrix Processing
         self._priors = priors
 
-
+    ## No need for the featureData() function in Python package
+    ## 
     def featureData(self):
         '''
         ## Apply one Surv class here to build Surv object
@@ -241,9 +265,6 @@ class MrmreData:
         
         return mi_matrix
 
-    ## Helper function to build censored data
-    def _survBuild(self, row):
-        return np.array([row['time'], row['event']])
 
     ## Helper function to expand FeatureMatrix
     # It seems like functions about feature matrix return array, but the functions about 
@@ -291,7 +312,7 @@ class MrmreData:
         # Compute the adaptor
         i, adaptor = 1, []
         for _, item in self._feature_types.iteritems():
-            if item != 3:
+            if item == 3:
                 adaptor.append(i)
             i += 1
             
@@ -308,7 +329,7 @@ class MrmreData:
         # Compute the adaptor
         i, adaptor = 1, []
         for _, item in self._feature_types.iteritems():
-            if item != 3:
+            if item == 3:
                 adaptor.append(i)
             i += 1
 
@@ -352,7 +373,6 @@ class MrmreData:
 
 
 
-        return 
 
 
 

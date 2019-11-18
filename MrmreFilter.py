@@ -15,6 +15,7 @@ class MrmreFilter:
                  prior_weight : float = None,
                  target_indices : list = [0],
                  levels : list = [0],
+                 fixed_feature_count  : int = 0,
                  method : str = 'exhaustive',
                  continuous_estimator : str = 'pearson',
                  outX : bool = True,
@@ -23,7 +24,7 @@ class MrmreFilter:
         ## Declare the private or protected variables here
         self._method = method
         self._continuous_estimator = MAP.estimator_map[continuous_estimator]
-        self._filter = pd.Series()
+        self._filters = pd.Series()
         self._scores = pd.Series()
         self._causality_list = pd.Series()
         self._feature_names = data.featureNames()
@@ -60,12 +61,13 @@ class MrmreFilter:
         self._levels = np.array(levels).astype(int)
 
         # The index 0/1 problems?
-        target_indices = data._expandFeatureIndices(self._target_indices + 1).astype(int)
+        target_indices = data._expandFeatureIndices(self._target_indices + 1).astype(int) - 1
 
-        ## Filter; Mutual Information and Causality Matrix
+        ## Filters; Mutual Information and Causality Matrix
         # Mutual Information matrix
-        mi_matrix = np.empty((data.sampleCount(), data.featureCount())).astype(np.double)
+        mi_matrix = np.empty((data.featureCount(), data.featureCount())).astype(np.double)
         mi_matrix[:] = np.nan
+        #print("The size of mi_matrix:", mi_matrix.shape)
 
 
         ## Check the input data for debugging
@@ -77,9 +79,13 @@ class MrmreFilter:
             if np.prod(levels) - 1 > comb(data.featureCount() - 1, len(levels)):
                 raise Exception('user cannot request for more solutions than is possible given the data set')
 
+            ## Print the input parameter for debugging
+
             res = export_filters(self._levels.astype(np.int32),
+                                 len(self._levels),
                                  data._data.values.flatten('F'),
-                                 np.array([]),
+                                 data._priors,
+                                 len(data._priors),
                                  prior_weight,
                                  data._strata.values.astype(np.int32),
                                  data._weights.values,
@@ -87,11 +93,13 @@ class MrmreFilter:
                                  data._data.shape[0],
                                  data._data.shape[1],
                                  len(data._strata.unique()),
-                                 self._target_indices.astype(np.uint32),
+                                 target_indices.astype(np.uint32),
+                                 fixed_feature_count,
+                                 len(target_indices),
                                  self._continuous_estimator,
                                  int(outX == True),
                                  bootstrap_count,
-                                 mi_matrix.flatten())
+                                 mi_matrix.flatten('F'))
         else:
             raise Exception('Unrecognized method: use exhaustive or bootstrap')
 
@@ -106,38 +114,42 @@ class MrmreFilter:
         print(filters)
         print(causality_list)
         print(scores)
-        
+
         # Build the filter based on solutions
         _filters = []
         for sol in filters:
-            _sol = data._compressFeatureIndices(sol + 1).reshape(len(self._levels), np.prod(self._levels))
+            _sol = data._compressFeatureIndices(np.array(sol) + 1).reshape(len(self._levels), np.prod(self._levels))
             _filters.append(_sol)
         
-        self._filter = pd.Series(_filters)
-        self._filter.index = target_indices
+        self._filters = pd.Series(_filters)
+        self._filters.index = self._target_indices
         
         # Build the causality list
+        ## Different from the above, the list is different from the array
+
         _causality_list = []
-        _, unique_indices = np.unique(data._compressFeatureIndices(list(range(data.sampleCount())), return_index = True))
+        _, unique_indices = np.unique(data._compressFeatureIndices(list(range(data.sampleCount()))), return_index = True)
         for cas in causality_list:
-            _cas = cas[unique_indices]
+            _cas = np.array(cas)[unique_indices]
             _causality_list.append(_cas)
         
         self._causality_list = pd.Series(_causality_list)
-        self._causality_list.index = target_indices
+        self._causality_list.index = self._target_indices
 
         # Build the scores matrix
+        ## Different from the above, the list is different from the array
         _scores = []
         for sc in scores:
-            _sc = sc.reshape(len(self._levels), np.prod(self._levels))
+            _sc = np.array(sc).reshape(len(self._levels), np.prod(self._levels))
             _scores.append(_sc)
-        
+
         self._scores = pd.Series(_scores)
-        self._scores.index = target_indices
-        
+        self._scores.index = self._target_indices
+
         # Build the mutual information matrix
-        self._mi_matrix = data._compressFeatureMatrix(mi_matrix.reshape(data.sampleCount(), data.featureCount()))
-        print(self._mi_matrix)
+        self._mi_matrix = data._compressFeatureMatrix(mi_matrix.reshape(data.featureCount(), data.featureCount()))
+        #self._mi_matrix = self._mi_matrix.reshape(data.featureCount(), data.featureCount())
+        #print(self._mi_matrix)
         
 
     def sampleCount(self):
@@ -162,10 +174,12 @@ class MrmreFilter:
         _filters = []
         for target_index in self._target_indices:
             result_matrix = self._filters.loc[target_index]
-            causality_dropped, _ = np.where(np.array(self._causality_list.loc[target_index]) > causality_threshold)
-            mi_dropped, _ = np.where(-.5 * np.log(1 - np.square(self._mi_matrix[:, target_index])) < mi_threshold)
+            causality_dropped = np.where(np.array(self._causality_list.loc[target_index]) > causality_threshold)
+            #mi_dropped = np.where(-.5 * np.log(1 - np.square(self._mi_matrix[:, target_index])) < mi_threshold)
             # Nan operation
-            dropped = set(list(causality_dropped) + list(mi_dropped))
+            #dropped = set(list(causality_dropped[0]) + list(mi_dropped[0]))
+            dropped = set(list(causality_dropped[0]))
+            print(result_matrix)
             for i, result in enumerate(result_matrix):
                 if result in dropped:
                     result_matrix[i] = np.nan
@@ -213,5 +227,3 @@ class MrmreFilter:
 
     def target(self):
         return self._target_indices
-
-        
