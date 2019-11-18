@@ -12,8 +12,7 @@ def mrmr_selection(features : pd.DataFrame,
                    solution_count : int = 1,
                    fixed_feature_count : int = 0,
                    method : str = 'exhaustive',
-                   estimator : str = 'pearson',
-                   survival : bool = False):
+                   estimator : str = 'pearson'):
 
     ## Handle some corner cases
     # The input features type
@@ -51,22 +50,37 @@ def mrmr_selection(features : pd.DataFrame,
     mrmr_data = MrmreData(data = features, 
                           feature_types = feature_types)
 
-    ## Here the 
     # Find the target indices and fixed features selected
+    '''
     target_indices = []
-    for tf in target_features:
+    for tf in target_features: 
         target_indices.append(features.columns.get_loc(tf))
-
+    '''
+    target_indices = target_features
     #fixed_selected_indices = list(range(fixed_selected_count))
     
     # Build the mRMR Filter
     levels = [solution_count] + [1] * (solution_feature_count - fixed_feature_count - 1)
     mrmr_filter = MrmreFilter(data = mrmr_data, 
                               target_indices = target_indices, 
-                              fixed_selected_count = fixed_feature_count,
+                              fixed_feature_count = fixed_feature_count,
                               levels = levels)
 
-    return mrmr_filter.solutions()
+    solutions, indices = [], []
+    mrmr_solutions = mrmr_filter.solutions()
+    for key, value in mrmr_solutions.items():
+        result = []
+        indices.append(key)
+        for col in range(value.shape[1]):
+            result.append(list(value[:, col]))
+            if fixed_feature_count > 0:
+                result[-1] = list(range(fixed_feature_count)) + result[-1]
+        solutions.append(result)
+    
+    solutions = pd.Series(solutions)
+    solutions.index = indices
+
+    return solutions
 
 def mrmr_selection_with_clinical(target_df : pd.DataFrame,
                    features_df : pd.DataFrame,
