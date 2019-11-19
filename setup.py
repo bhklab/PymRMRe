@@ -1,4 +1,4 @@
-from setuptools import setup, Extension
+from setuptools import setup, Extension, find_packages
 from Cython.Build import cythonize
 from Cython.Distutils import build_ext
 import numpy as np
@@ -15,8 +15,6 @@ extensions = Extension(
     "expt", 
     sources = ["expt/" + str for str in sources], 
     language = "c++", 
-    extra_compile_args = ["-stdlib=libc++"],
-    extra_link_args = ["-stdlib=libc++"],
     )
 
 requirements = [
@@ -24,9 +22,7 @@ requirements = [
     'pandas'
 ]
 
-if sys.platform == 'darwin' or 'linux':
-  os.environ['CC'] = 'clang'
-  os.environ['CXX'] = 'clang++'
+
 
 setup(
     name = "pymrmre",
@@ -36,23 +32,16 @@ setup(
     url="https://github.com/bhklab/PymRMRe",
     author="Bo Li, Benjamin Haibe-Kains",
     author_email="benjamin.haibe.kains@utoronto.ca",
-    packages=[
-        'expt',
-    ],
+    packages=find_packages(),
     include_package_data=True,
     install_requires=requirements,
     setup_requires=[
         'cython>=0.25',
-        'clang'
+        'gcc'
     ],
     license='MIT license',
     zip_safe=False,
     keywords='pymrmre featureselection genomics computationalbiology',
-    classifiers=[
-        'License :: OSI Approved :: MIT License',
-        'Programming Langauge :: Python :: 3.6'
-    ],
-    cmdclass={'build_ext': build_ext},
     ext_modules=cythonize(extensions),
     include_dirs=[np.get_include()]
     )
