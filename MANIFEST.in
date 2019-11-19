@@ -1,8 +1,8 @@
 include LICENSE
 include README.md
 
-recursive-include expt *.h *.cpp
+recursive-include expt *
 recursive-include data *
 
-recursive-exclude * __pycache__
-recursive-exclude * *.py[co]
+exclude .gitignore
+recursive-exclude dist *
