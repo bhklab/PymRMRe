@@ -9,19 +9,18 @@ import sys
 with open('README.md') as fh:
       readme = fh.read()
 
-sources = ["expt.pyx", "Matrix.cpp", "Data.cpp", "MutualInformationMatrix.cpp", "Filter.cpp", "Math.cpp"]
+expt = ["expt.pyx", "Matrix.cpp", "Data.cpp", "MutualInformationMatrix.cpp", "Filter.cpp", "Math.cpp"]
 
 extensions = Extension(
     "expt", 
-    sources = ["expt/" + str for str in sources], 
+    sources = ["pymrmre/expt/" + str for str in expt], 
     language = "c++", 
-    )
+)
 
 requirements = [
     'numpy',
     'pandas'
 ]
-
 
 
 setup(
@@ -37,7 +36,6 @@ setup(
     install_requires=requirements,
     setup_requires=[
         'cython>=0.25',
-        'gcc'
     ],
     license='MIT license',
     zip_safe=False,
