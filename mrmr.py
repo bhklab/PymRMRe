@@ -65,7 +65,10 @@ def mrmr_selection(features : pd.DataFrame,
                               target_indices = target_indices, 
                               fixed_feature_count = fixed_feature_count,
                               levels = levels)
+    
 
+    feature_names = list(features.columns.values)
+    '''
     solutions, indices = [], []
     mrmr_solutions = mrmr_filter.solutions()
     for key, value in mrmr_solutions.items():
@@ -77,8 +80,31 @@ def mrmr_selection(features : pd.DataFrame,
                 result[-1] = list(range(fixed_feature_count)) + result[-1]
         solutions.append(result)
     
+    print(solutions)
     solutions = pd.Series(solutions)
     solutions.index = indices
+    '''
+    
+    def find_feature_names(list_features : list):
+        result = []
+        for f in list_features:
+            result.append(feature_names[f])
+        return result
+
+    solutions, indices = [], []
+    mrmr_solutions = mrmr_filter.solutions()
+    for key, value in mrmr_solutions.items():
+        result = []
+        indices.append(feature_names[key])
+        for col in range(value.shape[1]):
+            result.append(list(value[:, col]))
+            if fixed_feature_count > 0:
+                result[-1] = list(range(fixed_feature_count)) + result[-1]
+            solutions.append(find_feature_names(result[-1]))
+    print(solutions)
+    solutions = pd.Series([solutions])
+    solutions.index = indices
+    
 
     return solutions
 
