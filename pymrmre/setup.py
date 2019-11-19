@@ -13,8 +13,8 @@ setuptools.setup(
     long_description_contenct_type="text/markdown",
     url="https://github.com/bhklab/PymRMRe",
     ext_modules=[Extension("cymrmre",
-                [".c", ".cpp",
-                include_dirs=["cymrmre/include"]]
+                [""].
+                include_dirs=["cymrmre/include"]
                 )]
     packages=setuptools.find_packages(),
     keywords='pharmacogenomics mrmr minimumredundacymaximumrelevance',
