@@ -111,11 +111,12 @@ def mrmr_classic(features: pd.DataFrame,
                  solution_length : int,
                  fixed_feature_count : int = 0,
                  method : str = 'exhaustive',
-                 estimator : str = 'pearson'):
+                 estimator : str = 'pearson',
+                 return_index : bool = False):
     
     return mrmr_ensemble(features = features, target_features = target_features, feature_types = feature_types,
                         solution_length = solution_length, fixed_feature_count = fixed_feature_count, 
-                        solution_count = 1, method = method, estimator = estimator)
+                        solution_count = 1, method = method, estimator = estimator, return_index = return_index)
 
 def mrmr_selection_with_clinical(target_df : pd.DataFrame,
                    features_df : pd.DataFrame,
