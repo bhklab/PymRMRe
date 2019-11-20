@@ -5,14 +5,14 @@ import os
 from MrmreData import *
 from MrmreFilter import *
 
-def mrmr_selection(features : pd.DataFrame,
-                   target_features : list,
-                   feature_types : list,
-                   solution_feature_count : int,
-                   solution_count : int = 1,
-                   fixed_feature_count : int = 0,
-                   method : str = 'exhaustive',
-                   estimator : str = 'pearson'):
+def mrmr_ensemble(features : pd.DataFrame,
+                  target_features : list,
+                  feature_types : list,
+                  solution_length : int,
+                  solution_count : int = 1,
+                  fixed_feature_count : int = 0,
+                  method : str = 'exhaustive',
+                  estimator : str = 'pearson'):
 
     ## Handle some corner cases
     # The input features type
@@ -30,7 +30,7 @@ def mrmr_selection(features : pd.DataFrame,
         raise Exception("The continuous estimator must be chosen from pearson, spearman, kendall and frequency")
 
     # The length of one features larger than fixed one
-    if fixed_feature_count > solution_feature_count:
+    if fixed_feature_count > solution_length:
         raise Exception("The count of fixed-selected features should be less than the expected count of one solution")
 
     
@@ -60,7 +60,7 @@ def mrmr_selection(features : pd.DataFrame,
     #fixed_selected_indices = list(range(fixed_selected_count))
     
     # Build the mRMR Filter
-    levels = [solution_count] + [1] * (solution_feature_count - fixed_feature_count - 1)
+    levels = [solution_count] + [1] * (solution_length - fixed_feature_count - 1)
     mrmr_filter = MrmreFilter(data = mrmr_data, 
                               target_indices = target_indices, 
                               fixed_feature_count = fixed_feature_count,
@@ -107,6 +107,19 @@ def mrmr_selection(features : pd.DataFrame,
     
 
     return solutions
+
+
+def mrmr_classic(features: pd.DataFrame,
+                 target_features : list,
+                 feature_types : list,
+                 solution_length : int,
+                 fixed_feature_count : int = 0,
+                 method : str = 'exhaustive',
+                 estimator : str = 'pearson'):
+    
+    return mrmr_ensemble(features = features, target_features = target_features, feature_types = feature_types,
+                        solution_length = solution_length, fixed_feature_count = fixed_feature_count, 
+                        solution_count = 1, method = method, estimator = estimator)
 
 def mrmr_selection_with_clinical(target_df : pd.DataFrame,
                    features_df : pd.DataFrame,
