@@ -12,7 +12,8 @@ def mrmr_ensemble(features : pd.DataFrame,
                   solution_count : int = 1,
                   fixed_feature_count : int = 0,
                   method : str = 'exhaustive',
-                  estimator : str = 'pearson'):
+                  estimator : str = 'pearson',
+                  return_index : bool = False):
 
     ## Handle some corner cases
     # The input features type
@@ -68,44 +69,39 @@ def mrmr_ensemble(features : pd.DataFrame,
     
 
     feature_names = list(features.columns.values)
-    '''
+    
     solutions, indices = [], []
     mrmr_solutions = mrmr_filter.solutions()
-    for key, value in mrmr_solutions.items():
-        result = []
-        indices.append(key)
-        for col in range(value.shape[1]):
-            result.append(list(value[:, col]))
-            if fixed_feature_count > 0:
-                result[-1] = list(range(fixed_feature_count)) + result[-1]
-        solutions.append(result)
-    
-    print(solutions)
-    solutions = pd.Series(solutions)
-    solutions.index = indices
-    '''
-    
-    def find_feature_names(list_features : list):
-        result = []
-        for f in list_features:
-            result.append(feature_names[f])
-        return result
 
-    solutions, indices = [], []
-    mrmr_solutions = mrmr_filter.solutions()
-    for key, value in mrmr_solutions.items():
-        result = []
-        indices.append(feature_names[key])
-        for col in range(value.shape[1]):
-            result.append(list(value[:, col]))
-            if fixed_feature_count > 0:
-                result[-1] = list(range(fixed_feature_count)) + result[-1]
-            solutions.append(find_feature_names(result[-1]))
-    print(solutions)
+    if return_index:
+        for key, value in mrmr_solutions.items():
+            result = []
+            indices.append(key)
+            for col in range(value.shape[1]):
+                result.append(list(value[:, col]))
+                if fixed_feature_count > 0:
+                    result[-1] = list(range(fixed_feature_count)) + result[-1]
+            solutions.append(result)
+    
+    else:
+        def find_feature_names(list_features : list):
+            result = []
+            for f in list_features:
+                result.append(feature_names[f])
+            return result
+
+        for key, value in mrmr_solutions.items():
+            result = []
+            indices.append(feature_names[key])
+            for col in range(value.shape[1]):
+                result.append(list(value[:, col]))
+                if fixed_feature_count > 0:
+                    result[-1] = list(range(fixed_feature_count)) + result[-1]
+                solutions.append(find_feature_names(result[-1]))
+    
     solutions = pd.Series([solutions])
     solutions.index = indices
     
-
     return solutions
 
 
