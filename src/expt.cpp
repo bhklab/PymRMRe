@@ -1750,18 +1750,18 @@ static const char __pyx_k_dataMatrix[] = "dataMatrix";
 static const char __pyx_k_export_mim[] = "export_mim";
 static const char __pyx_k_levelCount[] = "levelCount";
 static const char __pyx_k_ImportError[] = "ImportError";
-static const char __pyx_k_priorsCount[] = "priorsCount";
 static const char __pyx_k_sampleCount[] = "sampleCount";
-static const char __pyx_k_targetCount[] = "targetCount";
 static const char __pyx_k_RuntimeError[] = "RuntimeError";
 static const char __pyx_k_featureCount[] = "featureCount";
 static const char __pyx_k_featureTypes[] = "featureTypes";
+static const char __pyx_k_priorsLength[] = "priorsLength";
 static const char __pyx_k_priorsMatrix[] = "priorsMatrix";
 static const char __pyx_k_priorsWeight[] = "priorsWeight";
 static const char __pyx_k_sampleStrata[] = "sampleStrata";
 static const char __pyx_k_sampleWeights[] = "sampleWeights";
 static const char __pyx_k_bootstrapCount[] = "bootstrapCount";
 static const char __pyx_k_export_filters[] = "export_filters";
+static const char __pyx_k_solutionLength[] = "solutionLength";
 static const char __pyx_k_fixedFeatureCount[] = "fixedFeatureCount";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_sampleStratumCount[] = "sampleStratumCount";
@@ -1807,7 +1807,7 @@ static PyObject *__pyx_n_s_numpy;
 static PyObject *__pyx_kp_s_numpy_core_multiarray_failed_to;
 static PyObject *__pyx_kp_s_numpy_core_umath_failed_to_impor;
 static PyObject *__pyx_n_s_outX;
-static PyObject *__pyx_n_s_priorsCount;
+static PyObject *__pyx_n_s_priorsLength;
 static PyObject *__pyx_n_s_priorsMatrix;
 static PyObject *__pyx_n_s_priorsWeight;
 static PyObject *__pyx_n_s_range;
@@ -1816,12 +1816,12 @@ static PyObject *__pyx_n_s_sampleCount;
 static PyObject *__pyx_n_s_sampleStrata;
 static PyObject *__pyx_n_s_sampleStratumCount;
 static PyObject *__pyx_n_s_sampleWeights;
-static PyObject *__pyx_n_s_targetCount;
+static PyObject *__pyx_n_s_solutionLength;
 static PyObject *__pyx_n_s_targetFeatureIndices;
 static PyObject *__pyx_n_s_test;
 static PyObject *__pyx_kp_u_unknown_dtype_code_in_numpy_pxd;
 static PyObject *__pyx_n_s_version;
-static PyObject *__pyx_pf_4expt_export_filters(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_childrenCountPerLevel, int __pyx_v_levelCount, PyArrayObject *__pyx_v_dataMatrix, PyArrayObject *__pyx_v_priorsMatrix, int __pyx_v_priorsCount, double __pyx_v_priorsWeight, PyArrayObject *__pyx_v_sampleStrata, PyArrayObject *__pyx_v_sampleWeights, PyArrayObject *__pyx_v_featureTypes, int __pyx_v_sampleCount, int __pyx_v_featureCount, int __pyx_v_sampleStratumCount, PyArrayObject *__pyx_v_targetFeatureIndices, int __pyx_v_fixedFeatureCount, int __pyx_v_targetCount, int __pyx_v_continuousEstimator, int __pyx_v_outX, int __pyx_v_bootstrapCount, PyArrayObject *__pyx_v_miMatrix); /* proto */
+static PyObject *__pyx_pf_4expt_export_filters(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_childrenCountPerLevel, int __pyx_v_levelCount, PyArrayObject *__pyx_v_dataMatrix, PyArrayObject *__pyx_v_priorsMatrix, int __pyx_v_priorsLength, double __pyx_v_priorsWeight, PyArrayObject *__pyx_v_sampleStrata, PyArrayObject *__pyx_v_sampleWeights, PyArrayObject *__pyx_v_featureTypes, int __pyx_v_sampleCount, int __pyx_v_featureCount, int __pyx_v_sampleStratumCount, PyArrayObject *__pyx_v_targetFeatureIndices, int __pyx_v_fixedFeatureCount, int __pyx_v_solutionLength, int __pyx_v_continuousEstimator, int __pyx_v_outX, int __pyx_v_bootstrapCount, PyArrayObject *__pyx_v_miMatrix); /* proto */
 static PyObject *__pyx_pf_4expt_2export_mim(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_dataMatrix, PyArrayObject *__pyx_v_priorsMatrix, double __pyx_v_priorsWeight, PyArrayObject *__pyx_v_sampleStrata, PyArrayObject *__pyx_v_sampleWeights, PyArrayObject *__pyx_v_featureTypes, int __pyx_v_sampleCount, int __pyx_v_featureCount, int __pyx_v_sampleStratumCount, int __pyx_v_continuousEstimator, int __pyx_v_outX, int __pyx_v_bootstrapCount, PyArrayObject *__pyx_v_miMatrix); /* proto */
 static int __pyx_pf_5numpy_7ndarray___getbuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info, int __pyx_v_flags); /* proto */
 static void __pyx_pf_5numpy_7ndarray_2__releasebuffer__(PyArrayObject *__pyx_v_self, Py_buffer *__pyx_v_info); /* proto */
@@ -1854,7 +1854,7 @@ static PyObject *__pyx_pw_4expt_1export_filters(PyObject *__pyx_self, PyObject *
   int __pyx_v_levelCount;
   PyArrayObject *__pyx_v_dataMatrix = 0;
   PyArrayObject *__pyx_v_priorsMatrix = 0;
-  int __pyx_v_priorsCount;
+  int __pyx_v_priorsLength;
   double __pyx_v_priorsWeight;
   PyArrayObject *__pyx_v_sampleStrata = 0;
   PyArrayObject *__pyx_v_sampleWeights = 0;
@@ -1864,7 +1864,7 @@ static PyObject *__pyx_pw_4expt_1export_filters(PyObject *__pyx_self, PyObject *
   int __pyx_v_sampleStratumCount;
   PyArrayObject *__pyx_v_targetFeatureIndices = 0;
   int __pyx_v_fixedFeatureCount;
-  int __pyx_v_targetCount;
+  int __pyx_v_solutionLength;
   int __pyx_v_continuousEstimator;
   int __pyx_v_outX;
   int __pyx_v_bootstrapCount;
@@ -1873,7 +1873,7 @@ static PyObject *__pyx_pw_4expt_1export_filters(PyObject *__pyx_self, PyObject *
   __Pyx_RefNannyDeclarations
   __Pyx_RefNannySetupContext("export_filters (wrapper)", 0);
   {
-    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_childrenCountPerLevel,&__pyx_n_s_levelCount,&__pyx_n_s_dataMatrix,&__pyx_n_s_priorsMatrix,&__pyx_n_s_priorsCount,&__pyx_n_s_priorsWeight,&__pyx_n_s_sampleStrata,&__pyx_n_s_sampleWeights,&__pyx_n_s_featureTypes,&__pyx_n_s_sampleCount,&__pyx_n_s_featureCount,&__pyx_n_s_sampleStratumCount,&__pyx_n_s_targetFeatureIndices,&__pyx_n_s_fixedFeatureCount,&__pyx_n_s_targetCount,&__pyx_n_s_continuousEstimator,&__pyx_n_s_outX,&__pyx_n_s_bootstrapCount,&__pyx_n_s_miMatrix,0};
+    static PyObject **__pyx_pyargnames[] = {&__pyx_n_s_childrenCountPerLevel,&__pyx_n_s_levelCount,&__pyx_n_s_dataMatrix,&__pyx_n_s_priorsMatrix,&__pyx_n_s_priorsLength,&__pyx_n_s_priorsWeight,&__pyx_n_s_sampleStrata,&__pyx_n_s_sampleWeights,&__pyx_n_s_featureTypes,&__pyx_n_s_sampleCount,&__pyx_n_s_featureCount,&__pyx_n_s_sampleStratumCount,&__pyx_n_s_targetFeatureIndices,&__pyx_n_s_fixedFeatureCount,&__pyx_n_s_solutionLength,&__pyx_n_s_continuousEstimator,&__pyx_n_s_outX,&__pyx_n_s_bootstrapCount,&__pyx_n_s_miMatrix,0};
     PyObject* values[19] = {0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0};
     if (unlikely(__pyx_kwds)) {
       Py_ssize_t kw_args;
@@ -1945,7 +1945,7 @@ static PyObject *__pyx_pw_4expt_1export_filters(PyObject *__pyx_self, PyObject *
         }
         CYTHON_FALLTHROUGH;
         case  4:
-        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_priorsCount)) != 0)) kw_args--;
+        if (likely((values[4] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_priorsLength)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("export_filters", 1, 19, 19, 4); __PYX_ERR(0, 67, __pyx_L3_error)
         }
@@ -2005,7 +2005,7 @@ static PyObject *__pyx_pw_4expt_1export_filters(PyObject *__pyx_self, PyObject *
         }
         CYTHON_FALLTHROUGH;
         case 14:
-        if (likely((values[14] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_targetCount)) != 0)) kw_args--;
+        if (likely((values[14] = __Pyx_PyDict_GetItemStr(__pyx_kwds, __pyx_n_s_solutionLength)) != 0)) kw_args--;
         else {
           __Pyx_RaiseArgtupleInvalid("export_filters", 1, 19, 19, 14); __PYX_ERR(0, 67, __pyx_L3_error)
         }
@@ -2064,7 +2064,7 @@ static PyObject *__pyx_pw_4expt_1export_filters(PyObject *__pyx_self, PyObject *
     __pyx_v_levelCount = __Pyx_PyInt_As_int(values[1]); if (unlikely((__pyx_v_levelCount == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 68, __pyx_L3_error)
     __pyx_v_dataMatrix = ((PyArrayObject *)values[2]);
     __pyx_v_priorsMatrix = ((PyArrayObject *)values[3]);
-    __pyx_v_priorsCount = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_priorsCount == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 71, __pyx_L3_error)
+    __pyx_v_priorsLength = __Pyx_PyInt_As_int(values[4]); if (unlikely((__pyx_v_priorsLength == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 71, __pyx_L3_error)
     __pyx_v_priorsWeight = __pyx_PyFloat_AsDouble(values[5]); if (unlikely((__pyx_v_priorsWeight == (double)-1) && PyErr_Occurred())) __PYX_ERR(0, 72, __pyx_L3_error)
     __pyx_v_sampleStrata = ((PyArrayObject *)values[6]);
     __pyx_v_sampleWeights = ((PyArrayObject *)values[7]);
@@ -2074,7 +2074,7 @@ static PyObject *__pyx_pw_4expt_1export_filters(PyObject *__pyx_self, PyObject *
     __pyx_v_sampleStratumCount = __Pyx_PyInt_As_int(values[11]); if (unlikely((__pyx_v_sampleStratumCount == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 78, __pyx_L3_error)
     __pyx_v_targetFeatureIndices = ((PyArrayObject *)values[12]);
     __pyx_v_fixedFeatureCount = __Pyx_PyInt_As_int(values[13]); if (unlikely((__pyx_v_fixedFeatureCount == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 80, __pyx_L3_error)
-    __pyx_v_targetCount = __Pyx_PyInt_As_int(values[14]); if (unlikely((__pyx_v_targetCount == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 81, __pyx_L3_error)
+    __pyx_v_solutionLength = __Pyx_PyInt_As_int(values[14]); if (unlikely((__pyx_v_solutionLength == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 81, __pyx_L3_error)
     __pyx_v_continuousEstimator = __Pyx_PyInt_As_int(values[15]); if (unlikely((__pyx_v_continuousEstimator == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 82, __pyx_L3_error)
     __pyx_v_outX = __Pyx_PyInt_As_int(values[16]); if (unlikely((__pyx_v_outX == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 83, __pyx_L3_error)
     __pyx_v_bootstrapCount = __Pyx_PyInt_As_int(values[17]); if (unlikely((__pyx_v_bootstrapCount == (int)-1) && PyErr_Occurred())) __PYX_ERR(0, 84, __pyx_L3_error)
@@ -2096,7 +2096,7 @@ static PyObject *__pyx_pw_4expt_1export_filters(PyObject *__pyx_self, PyObject *
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_featureTypes), __pyx_ptype_5numpy_ndarray, 1, "featureTypes", 0))) __PYX_ERR(0, 75, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_targetFeatureIndices), __pyx_ptype_5numpy_ndarray, 1, "targetFeatureIndices", 0))) __PYX_ERR(0, 79, __pyx_L1_error)
   if (unlikely(!__Pyx_ArgTypeTest(((PyObject *)__pyx_v_miMatrix), __pyx_ptype_5numpy_ndarray, 1, "miMatrix", 0))) __PYX_ERR(0, 85, __pyx_L1_error)
-  __pyx_r = __pyx_pf_4expt_export_filters(__pyx_self, __pyx_v_childrenCountPerLevel, __pyx_v_levelCount, __pyx_v_dataMatrix, __pyx_v_priorsMatrix, __pyx_v_priorsCount, __pyx_v_priorsWeight, __pyx_v_sampleStrata, __pyx_v_sampleWeights, __pyx_v_featureTypes, __pyx_v_sampleCount, __pyx_v_featureCount, __pyx_v_sampleStratumCount, __pyx_v_targetFeatureIndices, __pyx_v_fixedFeatureCount, __pyx_v_targetCount, __pyx_v_continuousEstimator, __pyx_v_outX, __pyx_v_bootstrapCount, __pyx_v_miMatrix);
+  __pyx_r = __pyx_pf_4expt_export_filters(__pyx_self, __pyx_v_childrenCountPerLevel, __pyx_v_levelCount, __pyx_v_dataMatrix, __pyx_v_priorsMatrix, __pyx_v_priorsLength, __pyx_v_priorsWeight, __pyx_v_sampleStrata, __pyx_v_sampleWeights, __pyx_v_featureTypes, __pyx_v_sampleCount, __pyx_v_featureCount, __pyx_v_sampleStratumCount, __pyx_v_targetFeatureIndices, __pyx_v_fixedFeatureCount, __pyx_v_solutionLength, __pyx_v_continuousEstimator, __pyx_v_outX, __pyx_v_bootstrapCount, __pyx_v_miMatrix);
 
   /* function exit code */
   goto __pyx_L0;
@@ -2107,7 +2107,7 @@ static PyObject *__pyx_pw_4expt_1export_filters(PyObject *__pyx_self, PyObject *
   return __pyx_r;
 }
 
-static PyObject *__pyx_pf_4expt_export_filters(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_childrenCountPerLevel, int __pyx_v_levelCount, PyArrayObject *__pyx_v_dataMatrix, PyArrayObject *__pyx_v_priorsMatrix, int __pyx_v_priorsCount, double __pyx_v_priorsWeight, PyArrayObject *__pyx_v_sampleStrata, PyArrayObject *__pyx_v_sampleWeights, PyArrayObject *__pyx_v_featureTypes, int __pyx_v_sampleCount, int __pyx_v_featureCount, int __pyx_v_sampleStratumCount, PyArrayObject *__pyx_v_targetFeatureIndices, int __pyx_v_fixedFeatureCount, int __pyx_v_targetCount, int __pyx_v_continuousEstimator, int __pyx_v_outX, int __pyx_v_bootstrapCount, PyArrayObject *__pyx_v_miMatrix) {
+static PyObject *__pyx_pf_4expt_export_filters(CYTHON_UNUSED PyObject *__pyx_self, PyArrayObject *__pyx_v_childrenCountPerLevel, int __pyx_v_levelCount, PyArrayObject *__pyx_v_dataMatrix, PyArrayObject *__pyx_v_priorsMatrix, int __pyx_v_priorsLength, double __pyx_v_priorsWeight, PyArrayObject *__pyx_v_sampleStrata, PyArrayObject *__pyx_v_sampleWeights, PyArrayObject *__pyx_v_featureTypes, int __pyx_v_sampleCount, int __pyx_v_featureCount, int __pyx_v_sampleStratumCount, PyArrayObject *__pyx_v_targetFeatureIndices, int __pyx_v_fixedFeatureCount, int __pyx_v_solutionLength, int __pyx_v_continuousEstimator, int __pyx_v_outX, int __pyx_v_bootstrapCount, PyArrayObject *__pyx_v_miMatrix) {
   std::pair<std::vector<std::vector<int> > ,std::vector<std::vector<std::vector<double> > > >  __pyx_v_res;
   __Pyx_LocalBuf_ND __pyx_pybuffernd_childrenCountPerLevel;
   __Pyx_Buffer __pyx_pybuffer_childrenCountPerLevel;
@@ -2213,7 +2213,7 @@ static PyObject *__pyx_pf_4expt_export_filters(CYTHON_UNUSED PyObject *__pyx_sel
   /* "expt.pyx":87
  *                     np.ndarray[double, ndim = 1, mode = "c"] miMatrix):
  * 
- *     res = c_export_filters(&childrenCountPerLevel[0], levelCount, &dataMatrix[0], &priorsMatrix[0], priorsCount,             # <<<<<<<<<<<<<<
+ *     res = c_export_filters(&childrenCountPerLevel[0], levelCount, &dataMatrix[0], &priorsMatrix[0], priorsLength,             # <<<<<<<<<<<<<<
  *                             priorsWeight, &sampleStrata[0], &sampleWeights[0], &featureTypes[0], sampleCount,
  *                             featureCount, sampleStratumCount, &targetFeatureIndices[0], fixedFeatureCount,
  */
@@ -2223,20 +2223,20 @@ static PyObject *__pyx_pf_4expt_export_filters(CYTHON_UNUSED PyObject *__pyx_sel
 
   /* "expt.pyx":88
  * 
- *     res = c_export_filters(&childrenCountPerLevel[0], levelCount, &dataMatrix[0], &priorsMatrix[0], priorsCount,
+ *     res = c_export_filters(&childrenCountPerLevel[0], levelCount, &dataMatrix[0], &priorsMatrix[0], priorsLength,
  *                             priorsWeight, &sampleStrata[0], &sampleWeights[0], &featureTypes[0], sampleCount,             # <<<<<<<<<<<<<<
  *                             featureCount, sampleStratumCount, &targetFeatureIndices[0], fixedFeatureCount,
- *                             targetCount, continuousEstimator, outX, bootstrapCount, &miMatrix[0])
+ *                             solutionLength, continuousEstimator, outX, bootstrapCount, &miMatrix[0])
  */
   __pyx_t_4 = 0;
   __pyx_t_5 = 0;
   __pyx_t_6 = 0;
 
   /* "expt.pyx":89
- *     res = c_export_filters(&childrenCountPerLevel[0], levelCount, &dataMatrix[0], &priorsMatrix[0], priorsCount,
+ *     res = c_export_filters(&childrenCountPerLevel[0], levelCount, &dataMatrix[0], &priorsMatrix[0], priorsLength,
  *                             priorsWeight, &sampleStrata[0], &sampleWeights[0], &featureTypes[0], sampleCount,
  *                             featureCount, sampleStratumCount, &targetFeatureIndices[0], fixedFeatureCount,             # <<<<<<<<<<<<<<
- *                             targetCount, continuousEstimator, outX, bootstrapCount, &miMatrix[0])
+ *                             solutionLength, continuousEstimator, outX, bootstrapCount, &miMatrix[0])
  * 
  */
   __pyx_t_7 = 0;
@@ -2244,7 +2244,7 @@ static PyObject *__pyx_pf_4expt_export_filters(CYTHON_UNUSED PyObject *__pyx_sel
   /* "expt.pyx":90
  *                             priorsWeight, &sampleStrata[0], &sampleWeights[0], &featureTypes[0], sampleCount,
  *                             featureCount, sampleStratumCount, &targetFeatureIndices[0], fixedFeatureCount,
- *                             targetCount, continuousEstimator, outX, bootstrapCount, &miMatrix[0])             # <<<<<<<<<<<<<<
+ *                             solutionLength, continuousEstimator, outX, bootstrapCount, &miMatrix[0])             # <<<<<<<<<<<<<<
  * 
  * 
  */
@@ -2253,11 +2253,11 @@ static PyObject *__pyx_pf_4expt_export_filters(CYTHON_UNUSED PyObject *__pyx_sel
   /* "expt.pyx":87
  *                     np.ndarray[double, ndim = 1, mode = "c"] miMatrix):
  * 
- *     res = c_export_filters(&childrenCountPerLevel[0], levelCount, &dataMatrix[0], &priorsMatrix[0], priorsCount,             # <<<<<<<<<<<<<<
+ *     res = c_export_filters(&childrenCountPerLevel[0], levelCount, &dataMatrix[0], &priorsMatrix[0], priorsLength,             # <<<<<<<<<<<<<<
  *                             priorsWeight, &sampleStrata[0], &sampleWeights[0], &featureTypes[0], sampleCount,
  *                             featureCount, sampleStratumCount, &targetFeatureIndices[0], fixedFeatureCount,
  */
-  __pyx_v_res = c_export_filters((&(*__Pyx_BufPtrCContig1d(int *, __pyx_pybuffernd_childrenCountPerLevel.rcbuffer->pybuffer.buf, __pyx_t_1, __pyx_pybuffernd_childrenCountPerLevel.diminfo[0].strides))), __pyx_v_levelCount, (&(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_dataMatrix.rcbuffer->pybuffer.buf, __pyx_t_2, __pyx_pybuffernd_dataMatrix.diminfo[0].strides))), (&(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_priorsMatrix.rcbuffer->pybuffer.buf, __pyx_t_3, __pyx_pybuffernd_priorsMatrix.diminfo[0].strides))), __pyx_v_priorsCount, __pyx_v_priorsWeight, (&(*__Pyx_BufPtrCContig1d(int *, __pyx_pybuffernd_sampleStrata.rcbuffer->pybuffer.buf, __pyx_t_4, __pyx_pybuffernd_sampleStrata.diminfo[0].strides))), (&(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_sampleWeights.rcbuffer->pybuffer.buf, __pyx_t_5, __pyx_pybuffernd_sampleWeights.diminfo[0].strides))), (&(*__Pyx_BufPtrCContig1d(int *, __pyx_pybuffernd_featureTypes.rcbuffer->pybuffer.buf, __pyx_t_6, __pyx_pybuffernd_featureTypes.diminfo[0].strides))), __pyx_v_sampleCount, __pyx_v_featureCount, __pyx_v_sampleStratumCount, (&(*__Pyx_BufPtrCContig1d(unsigned int *, __pyx_pybuffernd_targetFeatureIndices.rcbuffer->pybuffer.buf, __pyx_t_7, __pyx_pybuffernd_targetFeatureIndices.diminfo[0].strides))), __pyx_v_fixedFeatureCount, __pyx_v_targetCount, __pyx_v_continuousEstimator, __pyx_v_outX, __pyx_v_bootstrapCount, (&(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_miMatrix.rcbuffer->pybuffer.buf, __pyx_t_8, __pyx_pybuffernd_miMatrix.diminfo[0].strides))));
+  __pyx_v_res = c_export_filters((&(*__Pyx_BufPtrCContig1d(int *, __pyx_pybuffernd_childrenCountPerLevel.rcbuffer->pybuffer.buf, __pyx_t_1, __pyx_pybuffernd_childrenCountPerLevel.diminfo[0].strides))), __pyx_v_levelCount, (&(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_dataMatrix.rcbuffer->pybuffer.buf, __pyx_t_2, __pyx_pybuffernd_dataMatrix.diminfo[0].strides))), (&(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_priorsMatrix.rcbuffer->pybuffer.buf, __pyx_t_3, __pyx_pybuffernd_priorsMatrix.diminfo[0].strides))), __pyx_v_priorsLength, __pyx_v_priorsWeight, (&(*__Pyx_BufPtrCContig1d(int *, __pyx_pybuffernd_sampleStrata.rcbuffer->pybuffer.buf, __pyx_t_4, __pyx_pybuffernd_sampleStrata.diminfo[0].strides))), (&(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_sampleWeights.rcbuffer->pybuffer.buf, __pyx_t_5, __pyx_pybuffernd_sampleWeights.diminfo[0].strides))), (&(*__Pyx_BufPtrCContig1d(int *, __pyx_pybuffernd_featureTypes.rcbuffer->pybuffer.buf, __pyx_t_6, __pyx_pybuffernd_featureTypes.diminfo[0].strides))), __pyx_v_sampleCount, __pyx_v_featureCount, __pyx_v_sampleStratumCount, (&(*__Pyx_BufPtrCContig1d(unsigned int *, __pyx_pybuffernd_targetFeatureIndices.rcbuffer->pybuffer.buf, __pyx_t_7, __pyx_pybuffernd_targetFeatureIndices.diminfo[0].strides))), __pyx_v_fixedFeatureCount, __pyx_v_solutionLength, __pyx_v_continuousEstimator, __pyx_v_outX, __pyx_v_bootstrapCount, (&(*__Pyx_BufPtrCContig1d(double *, __pyx_pybuffernd_miMatrix.rcbuffer->pybuffer.buf, __pyx_t_8, __pyx_pybuffernd_miMatrix.diminfo[0].strides))));
 
   /* "expt.pyx":93
  * 
@@ -5566,7 +5566,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_kp_s_numpy_core_multiarray_failed_to, __pyx_k_numpy_core_multiarray_failed_to, sizeof(__pyx_k_numpy_core_multiarray_failed_to), 0, 0, 1, 0},
   {&__pyx_kp_s_numpy_core_umath_failed_to_impor, __pyx_k_numpy_core_umath_failed_to_impor, sizeof(__pyx_k_numpy_core_umath_failed_to_impor), 0, 0, 1, 0},
   {&__pyx_n_s_outX, __pyx_k_outX, sizeof(__pyx_k_outX), 0, 0, 1, 1},
-  {&__pyx_n_s_priorsCount, __pyx_k_priorsCount, sizeof(__pyx_k_priorsCount), 0, 0, 1, 1},
+  {&__pyx_n_s_priorsLength, __pyx_k_priorsLength, sizeof(__pyx_k_priorsLength), 0, 0, 1, 1},
   {&__pyx_n_s_priorsMatrix, __pyx_k_priorsMatrix, sizeof(__pyx_k_priorsMatrix), 0, 0, 1, 1},
   {&__pyx_n_s_priorsWeight, __pyx_k_priorsWeight, sizeof(__pyx_k_priorsWeight), 0, 0, 1, 1},
   {&__pyx_n_s_range, __pyx_k_range, sizeof(__pyx_k_range), 0, 0, 1, 1},
@@ -5575,7 +5575,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_sampleStrata, __pyx_k_sampleStrata, sizeof(__pyx_k_sampleStrata), 0, 0, 1, 1},
   {&__pyx_n_s_sampleStratumCount, __pyx_k_sampleStratumCount, sizeof(__pyx_k_sampleStratumCount), 0, 0, 1, 1},
   {&__pyx_n_s_sampleWeights, __pyx_k_sampleWeights, sizeof(__pyx_k_sampleWeights), 0, 0, 1, 1},
-  {&__pyx_n_s_targetCount, __pyx_k_targetCount, sizeof(__pyx_k_targetCount), 0, 0, 1, 1},
+  {&__pyx_n_s_solutionLength, __pyx_k_solutionLength, sizeof(__pyx_k_solutionLength), 0, 0, 1, 1},
   {&__pyx_n_s_targetFeatureIndices, __pyx_k_targetFeatureIndices, sizeof(__pyx_k_targetFeatureIndices), 0, 0, 1, 1},
   {&__pyx_n_s_test, __pyx_k_test, sizeof(__pyx_k_test), 0, 0, 1, 1},
   {&__pyx_kp_u_unknown_dtype_code_in_numpy_pxd, __pyx_k_unknown_dtype_code_in_numpy_pxd, sizeof(__pyx_k_unknown_dtype_code_in_numpy_pxd), 0, 1, 0, 0},
@@ -5680,7 +5680,7 @@ static CYTHON_SMALL_CODE int __Pyx_InitCachedConstants(void) {
  *                     int levelCount,
  *                     np.ndarray[double, ndim = 1, mode = "c"] dataMatrix,
  */
-  __pyx_tuple__8 = PyTuple_Pack(20, __pyx_n_s_childrenCountPerLevel, __pyx_n_s_levelCount, __pyx_n_s_dataMatrix, __pyx_n_s_priorsMatrix, __pyx_n_s_priorsCount, __pyx_n_s_priorsWeight, __pyx_n_s_sampleStrata, __pyx_n_s_sampleWeights, __pyx_n_s_featureTypes, __pyx_n_s_sampleCount, __pyx_n_s_featureCount, __pyx_n_s_sampleStratumCount, __pyx_n_s_targetFeatureIndices, __pyx_n_s_fixedFeatureCount, __pyx_n_s_targetCount, __pyx_n_s_continuousEstimator, __pyx_n_s_outX, __pyx_n_s_bootstrapCount, __pyx_n_s_miMatrix, __pyx_n_s_res); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 67, __pyx_L1_error)
+  __pyx_tuple__8 = PyTuple_Pack(20, __pyx_n_s_childrenCountPerLevel, __pyx_n_s_levelCount, __pyx_n_s_dataMatrix, __pyx_n_s_priorsMatrix, __pyx_n_s_priorsLength, __pyx_n_s_priorsWeight, __pyx_n_s_sampleStrata, __pyx_n_s_sampleWeights, __pyx_n_s_featureTypes, __pyx_n_s_sampleCount, __pyx_n_s_featureCount, __pyx_n_s_sampleStratumCount, __pyx_n_s_targetFeatureIndices, __pyx_n_s_fixedFeatureCount, __pyx_n_s_solutionLength, __pyx_n_s_continuousEstimator, __pyx_n_s_outX, __pyx_n_s_bootstrapCount, __pyx_n_s_miMatrix, __pyx_n_s_res); if (unlikely(!__pyx_tuple__8)) __PYX_ERR(0, 67, __pyx_L1_error)
   __Pyx_GOTREF(__pyx_tuple__8);
   __Pyx_GIVEREF(__pyx_tuple__8);
   __pyx_codeobj__9 = (PyObject*)__Pyx_PyCode_New(19, 0, 20, 0, CO_OPTIMIZED|CO_NEWLOCALS, __pyx_empty_bytes, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_tuple__8, __pyx_empty_tuple, __pyx_empty_tuple, __pyx_kp_s_expt_pyx, __pyx_n_s_export_filters, 67, __pyx_empty_bytes); if (unlikely(!__pyx_codeobj__9)) __PYX_ERR(0, 67, __pyx_L1_error)
