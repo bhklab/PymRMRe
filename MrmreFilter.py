@@ -29,6 +29,7 @@ class MrmreFilter:
         self._causality_list = pd.Series()
         self._feature_names = data.featureNames()
         self._sample_names = data.sampleNames()
+        self._fixed_feature_count = fixed_feature_count
 
         '''
         if type(data) != 'MrmreData':
@@ -94,7 +95,7 @@ class MrmreFilter:
                                  data._data.shape[1],
                                  len(data._strata.unique()),
                                  target_indices.astype(np.uint32),
-                                 fixed_feature_count,
+                                 self._fixed_feature_count,
                                  len(target_indices),
                                  self._continuous_estimator,
                                  int(outX == True),
@@ -110,11 +111,7 @@ class MrmreFilter:
         filters = res[0]              # List<List<int>>
         causality_list = res[1][0]      # List<List<float>>
         scores = res[1][1]              # List<List<float>>
-
-        print(filters)
-        print(causality_list)
-        print(scores)
-
+        
         # Build the filter based on solutions
         _filters = []
         for sol in filters:
@@ -181,10 +178,10 @@ class MrmreFilter:
             # Nan operation
             #dropped = set(list(causality_dropped[0]) + list(mi_dropped[0]))
             dropped = set(list(causality_dropped[0]))
-            print(result_matrix)
-            for i, result in enumerate(result_matrix):
-                if result in dropped:
-                    result_matrix[i] = np.nan
+            for i in range(result_matrix.shape[0]):
+                for j in range(result_matrix.shape[1]):
+                    if result_matrix[i, j] in dropped:
+                        result_matrix[i, j] = np.nan
             
             pre_return_matrix = np.flip(result_matrix, axis = 0)
             _filters.append(pre_return_matrix)
