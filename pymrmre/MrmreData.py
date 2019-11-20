@@ -1,9 +1,9 @@
 import numpy as np 
 import pandas as pd 
 import math
-from src.expt import export_mim
-from src.expt import export_filters
-from constants import *
+#from pymrmre.expt import export_mim
+#from pymrmre.expt import export_filters
+#from pymrmre.constants import *
 
 class MrmreData:
   

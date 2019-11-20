@@ -1,12 +1,11 @@
 import numpy as np 
 import pandas as pd 
-import constants
-#import expt
-from src.expt import export_filters
-from src.expt import export_mim
-from MrmreData import *
-from constants import *
-from scipy.special import comb
+#import constants
+#from pymrmre.expt import export_filters
+#from pymrmre.expt import export_mim
+from pymrmre.MrmreData import MrmreData
+#from pymrmre.constants import *
+#from scipy.special import comb
 
 class MrmreFilter:
 

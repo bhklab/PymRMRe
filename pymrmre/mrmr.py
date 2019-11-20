@@ -2,8 +2,8 @@
 import numpy as np
 import pandas as pd
 import os
-from MrmreData import *
-from MrmreFilter import *
+#from pymrmre.MrmreFilter import MrmreFilter
+#from pymrmre.MrmreData import MrmreData
 
 def mrmr_selection(features : pd.DataFrame,
                    target_features : list,
