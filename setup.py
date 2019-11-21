@@ -22,6 +22,9 @@ requirements = [
     'pandas'
 ]
 
+if sys.platform == 'darwin':
+  os.environ['CC'] = 'clang-omp'
+  os.environ['CXX'] = 'clang-omp++'
 
 setup(
     name = "pymrmre",
@@ -35,7 +38,7 @@ setup(
     include_package_data=True,
     install_requires=requirements,
     setup_requires=[
-        'cython>=0.25',
+        'cython>=0.25'
     ],
     license='MIT license',
     zip_safe=False,
