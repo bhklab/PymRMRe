@@ -14,7 +14,9 @@ expt = ["expt.pyx", "Matrix.cpp", "Data.cpp", "MutualInformationMatrix.cpp", "Fi
 extensions = Extension(
     "expt", 
     sources = ["pymrmre/expt/" + str for str in expt], 
-    language = "c++", 
+    language = "c++",
+    extra_link_args=['-fopenmp'],
+    extra_compile_args=["-fopenmp", "-Ofast"],
 )
 
 requirements = [
