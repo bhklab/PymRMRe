@@ -35,15 +35,6 @@ def mrmr_ensemble(features : pd.DataFrame,
         raise Exception("The count of fixed-selected features should be less than the expected count of one solution")
 
     
-    # No need for data pre-processing, since the data frame input is already the combined version
-    ## No need to specify the survival option, since no matter what the target indices have to 
-    ## be the input
-    '''
-    if not survival:
-        features['time'] = features['target']
-        features['event'] = 1
-    '''
-    
     #features.set_index('id', replace = True)
     features = features.infer_objects()
 
@@ -52,14 +43,15 @@ def mrmr_ensemble(features : pd.DataFrame,
                           feature_types = feature_types)
 
     # Find the target indices and fixed features selected
-    '''
     target_indices = []
-    for tf in target_features: 
-        target_indices.append(features.columns.get_loc(tf))
-    '''
-    target_indices = target_features
-    #fixed_selected_indices = list(range(fixed_selected_count))
-    
+    if type(target_features[0]) == str:
+        for tf in target_features: 
+            target_indices.append(features.columns.get_loc(tf))
+    elif type(target_features[0]) == int:
+        target_indices = target_features
+    else:
+        raise Exception("The target feature input should be string (feature name) or integer (indices)")
+
     # Build the mRMR Filter
     levels = [solution_count] + [1] * (solution_length - fixed_feature_count - 1)
     mrmr_filter = MrmreFilter(data = mrmr_data, 
@@ -117,69 +109,4 @@ def mrmr_classic(features: pd.DataFrame,
     return mrmr_ensemble(features = features, target_features = target_features, feature_types = feature_types,
                         solution_length = solution_length, fixed_feature_count = fixed_feature_count, 
                         solution_count = 1, method = method, estimator = estimator, return_index = return_index)
-
-def mrmr_selection_with_clinical(target_df : pd.DataFrame,
-                   features_df : pd.DataFrame,
-                   target_features : list,
-                   feature_count : int,
-                   solution_count : int = 1,
-                   method : str = 'exhaustive',
-                   estimator : str = 'pearson',
-                   survival : bool = False):
-    # Data Pre-processing
-    target = target_df.copy()
-    if not survival:
-        target['time'] = target['target']
-        target['event'] = 1
-    
-    target.set_index('id', inplace = True)
-    features = features_df.merge(target[['time', 'event']], how = 'inner', left_index = True, right_index = True)
-    features = features.infer_objects()
-
-    # Build the mRMR Data
-    mrmr_data = MrmreData(data = features)
-    
-    # Find the target_indices
-    target_indices = []
-    for feature in target_features:
-        target_indices.append(features.columns.get_loc(feature))
-
-    # Build the mRMR Filter
-    levels = [solution_count] + [1] * features_count
-    mrmr_filter = MrmreFilter(data = mrmr_data, target_indices = target_indices, levels = levels)
-    
-    return mrmr_filter._filter
-    
-
-'''
-def run_mrmr_selections(features : pd.DataFrame,
-                        solution_count : int = 1,
-                        features_count : int,
-                        target_indices : np.array):
-
-    mrmr_data = MrmreData(data = features)
-    levels = [solution_count] + [1] * features_count
-    mrmr_filter = MrmreFilter(data = mrmr_data, target_indices = target_indices, levels = np.array(levels))
-    selected_features = mrmr_filter._filter
-    return selected_features.iloc[:, 0]
-    
-
-def mrmr_selection(features : pd.DataFrame,
-                   target_df : pd.DataFrame,
-                   solution_count : int,
-                   feature_count : int,
-                   survival : bool = false):
-    
-    target = target_df.copy()
-    # Merge the features and labels
-    if not survival:
-        target['time'] = target['target']
-        target['event'] = 1
-
-    features = features.merge(target[['time', 'event']], how = 'inner', left_index = True, right_index = True)
-    mrmr_list = run_mrmr_selections(features, solution_count, features_count, 'time')
-    return mrmr_list
-'''
-
-    
 
