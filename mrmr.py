@@ -13,7 +13,8 @@ def mrmr_ensemble(features : pd.DataFrame,
                   fixed_feature_count : int = 0,
                   method : str = 'exhaustive',
                   estimator : str = 'pearson',
-                  return_index : bool = False):
+                  return_index : bool = False,
+                  return_with_fixed : bool = True):
 
     ## Handle some corner cases
     # The input features type
@@ -33,6 +34,10 @@ def mrmr_ensemble(features : pd.DataFrame,
     # The length of one features larger than fixed one
     if fixed_feature_count > solution_length:
         raise Exception("The count of fixed-selected features should be less than the expected count of one solution")
+
+    if fixed_feature_count <= 0:
+        fixed_feature_count = 0
+        return_with_fixed = False
 
     
     #features.set_index('id', replace = True)
@@ -65,13 +70,14 @@ def mrmr_ensemble(features : pd.DataFrame,
     solutions, indices = [], []
     mrmr_solutions = mrmr_filter.solutions()
 
+
     if return_index:
         for key, value in mrmr_solutions.items():
             result = []
             indices.append(key)
             for col in range(value.shape[1]):
                 result.append(list(value[:, col]))
-                if fixed_feature_count > 0:
+                if fixed_feature_count > 0 and return_with_fixed:
                     result[-1] = list(range(fixed_feature_count)) + result[-1]
             solutions.append(result)
     
@@ -87,7 +93,7 @@ def mrmr_ensemble(features : pd.DataFrame,
             indices.append(feature_names[key])
             for col in range(value.shape[1]):
                 result.append(list(value[:, col]))
-                if fixed_feature_count > 0:
+                if fixed_feature_count > 0 and return_with_fixed:
                     result[-1] = list(range(fixed_feature_count)) + result[-1]
                 solutions.append(find_feature_names(result[-1]))
     
