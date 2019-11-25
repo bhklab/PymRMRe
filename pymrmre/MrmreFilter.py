@@ -1,6 +1,11 @@
 import numpy as np 
 import pandas as pd 
-from pymrmre.MrmreData import MrmreData
+import constants
+from src.expt import export_filters
+from src.expt import export_mim
+from MrmreData import *
+from constants import *
+from scipy.special import comb
 
 class MrmreFilter:
 
@@ -23,6 +28,7 @@ class MrmreFilter:
         self._causality_list = pd.Series()
         self._feature_names = data.featureNames()
         self._sample_names = data.sampleNames()
+        self._fixed_feature_count = fixed_feature_count
 
         '''
         if type(data) != 'MrmreData':
@@ -42,38 +48,27 @@ class MrmreFilter:
         if any(x < 0 for x in target_indices) or any(x > data.featureCount() - 1 for x in target_indices):
             raise Exception('target indices must only contain values ranging from 0 to the number of features minus one in data')
         
-        # This is because sometimes we accept the column names as inputs (the feature names)
-        # But I will process this before
         self._target_indices = np.array(target_indices).astype(int)
-        #self._target_indices = target_indices.astype(int)
+        
         ## Level processing
 
         if len(levels) == 0:
             raise Exception('levels must be provided')
-        
-        #self._levels = levels.astype(int)
+
         self._levels = np.array(levels).astype(int)
 
-        # The index 0/1 problems?
         target_indices = data._expandFeatureIndices(self._target_indices + 1).astype(int) - 1
 
         ## Filters; Mutual Information and Causality Matrix
         # Mutual Information matrix
         mi_matrix = np.empty((data.featureCount(), data.featureCount())).astype(np.double)
         mi_matrix[:] = np.nan
-        #print("The size of mi_matrix:", mi_matrix.shape)
-
-
-        ## Check the input data for debugging
-       
 
         if method == 'exhaustive':
 
             ## Level processing
             if np.prod(levels) - 1 > comb(data.featureCount() - 1, len(levels)):
                 raise Exception('user cannot request for more solutions than is possible given the data set')
-
-            ## Print the input parameter for debugging
 
             res = export_filters(self._levels.astype(np.int32),
                                  len(self._levels),
@@ -88,7 +83,7 @@ class MrmreFilter:
                                  data._data.shape[1],
                                  len(data._strata.unique()),
                                  target_indices.astype(np.uint32),
-                                 fixed_feature_count,
+                                 self._fixed_feature_count,
                                  len(target_indices),
                                  self._continuous_estimator,
                                  int(outX == True),
@@ -100,15 +95,10 @@ class MrmreFilter:
 
         ## After building the result, result is the data structure of Result defind in exports.h
         ## The returned filter is object of list
-        ## The returned filter need to use target lists as name
         filters = res[0]              # List<List<int>>
         causality_list = res[1][0]      # List<List<float>>
         scores = res[1][1]              # List<List<float>>
-
-        print(filters)
-        print(causality_list)
-        print(scores)
-
+        
         # Build the filter based on solutions
         _filters = []
         for sol in filters:
@@ -120,7 +110,6 @@ class MrmreFilter:
         self._filters.index = self._target_indices
         
         # Build the causality list
-        ## Different from the above, the list is different from the array
 
         _causality_list = []
         _, unique_indices = np.unique(data._compressFeatureIndices(list(range(data.featureCount()))), return_index = True)
@@ -132,7 +121,7 @@ class MrmreFilter:
         self._causality_list.index = self._target_indices
 
         # Build the scores matrix
-        ## Different from the above, the list is different from the array
+
         _scores = []
         for sc in scores:
             _sc = np.array(sc).reshape(np.prod(self._levels), len(self._levels))
@@ -144,9 +133,7 @@ class MrmreFilter:
 
         # Build the mutual information matrix
         self._mi_matrix = data._compressFeatureMatrix(mi_matrix.reshape(data.featureCount(), data.featureCount()))
-        #self._mi_matrix = self._mi_matrix.reshape(data.featureCount(), data.featureCount())
-        #print(self._mi_matrix)
-        
+
 
     def sampleCount(self):
 
@@ -171,14 +158,14 @@ class MrmreFilter:
         for target_index in self._target_indices:
             result_matrix = self._filters.loc[target_index]
             causality_dropped = np.where(np.array(self._causality_list.loc[target_index]) > causality_threshold)
-            #mi_dropped = np.where(-.5 * np.log(1 - np.square(self._mi_matrix[:, target_index])) < mi_threshold)
+            mi_dropped = np.where(-.5 * np.log(1 - np.square(self._mi_matrix[:, target_index])) < mi_threshold)
             # Nan operation
-            #dropped = set(list(causality_dropped[0]) + list(mi_dropped[0]))
-            dropped = set(list(causality_dropped[0]))
-            print(result_matrix)
-            for i, result in enumerate(result_matrix):
-                if result in dropped:
-                    result_matrix[i] = np.nan
+            dropped = set(list(causality_dropped[0]) + list(mi_dropped[0]))
+            #dropped = set(list(causality_dropped[0]))
+            for i in range(result_matrix.shape[0]):
+                for j in range(result_matrix.shape[1]):
+                    if result_matrix[i, j] in dropped:
+                        result_matrix[i, j] = np.nan
             
             pre_return_matrix = np.flip(result_matrix, axis = 0)
             _filters.append(pre_return_matrix)
@@ -194,7 +181,6 @@ class MrmreFilter:
         scores = pd.Series()
         solutions = self._solutions()
         for i, target in enumerate(target_indices):
-            # 
             sub_solution = solutions.loc(target)   # The sub_solution is matrix(np.array)
             sub_score_target = np.array()
             for col in range(sub_solution.shape[1]):

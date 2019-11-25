@@ -1,6 +1,9 @@
 import numpy as np 
 import pandas as pd 
 import math
+from src.expt import export_mim
+from src.expt import export_filters
+from constants import *
 
 class MrmreData:
   
@@ -31,57 +34,22 @@ class MrmreData:
             raise Exception("Too many features, the number of features should be <= 46340")
  
         # Build the feature types
-        ## This part will be modified, since we force the features types as one input
+
         self._feature_types = pd.Series(feature_types)
         self._feature_types.index = list(range(data.shape[1]))
-        
-        '''
-        _feature_types = []
-        _feature_names = list(range(data.shape[1]))
-        for col in data:
-            if col in ['time', 'event']:
-                _feature_types.append(MAP.features_map[col])
-            elif data.loc[:, col].dtype.name == 'category':
-                _feature_types.append(MAP.features_map['discrete'])
-            else:
-                _feature_types.append(MAP.features_map['continuous'])
-
-        self._feature_types = pd.Series(_feature_types)
-        self._feature_types.index = _feature_names
-        '''
+       
         
         ## Build the mRMR data
-
         
         if self._feature_types.sum() == 0:
             self._data = data
         else:
             for i, col in enumerate(data):
-                '''
-                if self._feature_types[i] == 0:       # Continuous
-                    self._data[col] = data.loc[:, col] '''
                 if self._feature_types[i] == 1:     # Factor variables
                     self._data[col] = data.loc[:, col].astype(int) - 1
-                else:  # Do we need to handle the feature type?
+                else:  
                     self._data[col] = data.loc[:, col]
         
-        
-        #print(self._data)
-        #print(self._feature_types)
-        # Need to guarantee the event must be ahead of the time
-        '''
-
-        if self._feature_types.sum() == 0:
-            self._data = data
-        else:
-            for i, col in enumerate(data):
-                if self._feature_types[i] == MAP.features_map['continuous']:
-                    self._data[col] = data.loc[:, col]
-                elif self._feature_types[i] == MAP.features_map['discrete']:
-                    self._data[col] = data.loc[:, col].astype(int) - 1
-                elif col == 'time' or col == 'event':    # Should be fine here
-                    self._data[col] = data.loc[:, col]
-        '''
 
         # Sample Stratum processing
         self._strata = strata if strata else pd.Series(np.zeros(data.shape[0]))
@@ -190,8 +158,6 @@ class MrmreData:
                 raise Exception('Strata must be provided as factors')
             elif value.isnull().any().any():
                 raise Exception('Cannot have missing value in strata')
-            # Why we need to return self variable in this case?
-            # Do we need to minus one here?
             self._strata = value.astype(int)
 
     ## SampleWeights
@@ -241,9 +207,6 @@ class MrmreData:
         call the export_mim cpp function
         '''
         mi_matrix = np.empty([self._data.shape[1], self._data.shape[1]])
-        ######################
-        ## Need to convert all 2d arrays to 1d ??
-        ######################
         export_mim(self._data.values.flatten(), 
                         self._priors.flatten(), 
                         prior_weight, 
@@ -264,10 +227,7 @@ class MrmreData:
 
 
     ## Helper function to expand FeatureMatrix
-    # It seems like functions about feature matrix return array, but the functions about 
-    # feature indices return pandas series ? Should still be array
 
-    ## There exists the problem that the adaptor returned is string
     def _expandFeatureMatrix(self, matrix):
         expanded_matrix, adaptor = [], []
         # Compute the adaptor
@@ -300,8 +260,8 @@ class MrmreData:
             if item != 3:
                 adaptor.append(i)
             i += 1
-
-        return matrix[adaptor, adaptor]
+        
+        return matrix[adaptor][:, adaptor]
 
     ## expandFeatureIndices
     def _expandFeatureIndices(self, indices):
@@ -330,7 +290,6 @@ class MrmreData:
                 adaptor.append(i)
             i += 1
 
-        # It's correct here
         if len(adaptor) > 0:
             for i, index in enumerate(indices):
                 indices[i] -= len([j for j in adaptor if index >= j])
