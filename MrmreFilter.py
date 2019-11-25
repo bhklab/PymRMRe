@@ -158,10 +158,10 @@ class MrmreFilter:
         for target_index in self._target_indices:
             result_matrix = self._filters.loc[target_index]
             causality_dropped = np.where(np.array(self._causality_list.loc[target_index]) > causality_threshold)
-            #mi_dropped = np.where(-.5 * np.log(1 - np.square(self._mi_matrix[:, target_index])) < mi_threshold)
+            mi_dropped = np.where(-.5 * np.log(1 - np.square(self._mi_matrix[:, target_index])) < mi_threshold)
             # Nan operation
-            #dropped = set(list(causality_dropped[0]) + list(mi_dropped[0]))
-            dropped = set(list(causality_dropped[0]))
+            dropped = set(list(causality_dropped[0]) + list(mi_dropped[0]))
+            #dropped = set(list(causality_dropped[0]))
             for i in range(result_matrix.shape[0]):
                 for j in range(result_matrix.shape[1]):
                     if result_matrix[i, j] in dropped:

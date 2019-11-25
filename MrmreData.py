@@ -260,8 +260,8 @@ class MrmreData:
             if item != 3:
                 adaptor.append(i)
             i += 1
-
-        return matrix[adaptor, adaptor]
+        
+        return matrix[adaptor][:, adaptor]
 
     ## expandFeatureIndices
     def _expandFeatureIndices(self, indices):
