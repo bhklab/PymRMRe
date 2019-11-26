@@ -79,6 +79,7 @@ def mrmr_ensemble(features : pd.DataFrame,
                 result.append(list(value[:, col]))
                 if fixed_feature_count > 0 and return_with_fixed:
                     result[-1] = list(range(fixed_feature_count)) + result[-1]
+            
             solutions.append(result)
     
     else:
@@ -95,9 +96,11 @@ def mrmr_ensemble(features : pd.DataFrame,
                 result.append(list(value[:, col]))
                 if fixed_feature_count > 0 and return_with_fixed:
                     result[-1] = list(range(fixed_feature_count)) + result[-1]
-                solutions.append(find_feature_names(result[-1]))
+                result[-1] = find_feature_names(result[-1])
+            
+            solutions.append(result)
     
-    solutions = pd.Series([solutions])
+    solutions = pd.Series(solutions)
     solutions.index = indices
     
     return solutions
