@@ -25,14 +25,14 @@ requirements = [
 ]
 
 if sys.platform == 'darwin':
-  os.environ['CC'] = 'clang-omp'
-  os.environ['CXX'] = 'clang-omp++'
+  os.environ['CC'] = 'gcc'
+  os.environ['CXX'] = 'g++'
 
 setup(
     name = "pymrmre",
     version="0.1.0",
     description="A Python package for Parallelized Minimum Redundancy, Maximum Relevance (mRMR) Ensemble Feature selections.",
-    longdescription=readme,
+    long_description=readme,
     url="https://github.com/bhklab/PymRMRe",
     author="Bo Li, Benjamin Haibe-Kains",
     author_email="benjamin.haibe.kains@utoronto.ca",
