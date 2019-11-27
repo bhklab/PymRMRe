@@ -18,24 +18,24 @@ cdef extern from "exports.cpp":
         #np.int64_t
     
     cdef pair[vector[vector[int]], vector[vector[vector[double]]]]  c_export_filters(const int* const childrenCountPerLevel, 
-                    const unsigned int levelCount,
-                    double* const dataMatrix, 
-                    double* const priorsMatrix, 
-                    const unsigned int priorsCount,
-                    const double priorsWeight,
-                    const int* const sampleStrata, 
-                    const double* const sampleWeights, 
-                    const int* const featureTypes, 
-                    const unsigned int sampleCount, 
-                    const unsigned int featureCount, 
-                    const unsigned int sampleStratumCount, 
-                    unsigned int* targetFeatureIndices, 
-                    const unsigned int fixedFeatureCount,
-                    const unsigned int targetCount,
-                    const unsigned int continuousEstimator, 
-                    const unsigned int outX, 
-                    const unsigned int bootstrapCount, 
-                    double* const miMatrix)
+            const unsigned int levelCount,
+            double* const dataMatrix, 
+            double* const priorsMatrix, 
+            const unsigned int priorsLength,
+            const double priorsWeight, 
+            const int* const sampleStrata, 
+            const double* const sampleWeights, 
+            const int* const featureTypes, 
+            const unsigned int sampleCount, 
+            const unsigned int featureCount, 
+            const unsigned int sampleStratumCount, 
+            unsigned int* targetFeatureIndices, 
+            const unsigned int fixedFeatureCount,
+            const unsigned int solutionLength,
+            const unsigned int continuousEstimator, 
+            const unsigned int outX, 
+            const unsigned int bootstrapCount, 
+            double* const miMatrix)
 
     cdef void c_export_mim(double* const dataMatrix, 
            double* const priorsMatrix, 
@@ -68,7 +68,7 @@ def export_filters(np.ndarray[int, ndim = 1, mode = "c"] childrenCountPerLevel,
                     int levelCount,
                     np.ndarray[double, ndim = 1, mode = "c"] dataMatrix, 
                     np.ndarray[double, ndim = 1, mode = "c"] priorsMatrix, 
-                    int priorsCount,
+                    int priorsLength,
                     double priorsWeight, 
                     np.ndarray[int, ndim = 1, mode = "c"] sampleStrata, 
                     np.ndarray[double, ndim = 1, mode = "c"] sampleWeights,
@@ -78,16 +78,17 @@ def export_filters(np.ndarray[int, ndim = 1, mode = "c"] childrenCountPerLevel,
                     int sampleStratumCount, 
                     np.ndarray[unsigned int, ndim = 1, mode = "c"] targetFeatureIndices, 
                     int fixedFeatureCount,
-                    int targetCount,
+                    int solutionLength,
                     int continuousEstimator,
                     int outX, 
                     int bootstrapCount, 
                     np.ndarray[double, ndim = 1, mode = "c"] miMatrix):
     
-    res = c_export_filters(&childrenCountPerLevel[0], levelCount, &dataMatrix[0], &priorsMatrix[0], priorsCount,
+    res = c_export_filters(&childrenCountPerLevel[0], levelCount, &dataMatrix[0], &priorsMatrix[0], priorsLength,
                             priorsWeight, &sampleStrata[0], &sampleWeights[0], &featureTypes[0], sampleCount, 
                             featureCount, sampleStratumCount, &targetFeatureIndices[0], fixedFeatureCount, 
-                            targetCount, continuousEstimator, outX, bootstrapCount, &miMatrix[0])
+                            solutionLength, continuousEstimator, outX, bootstrapCount, &miMatrix[0])
+
 
     return res
 

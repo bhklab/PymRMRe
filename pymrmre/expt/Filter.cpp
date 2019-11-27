@@ -1,4 +1,5 @@
 #include "Filter.h"
+#include <iostream>
 
 Filter::Filter(int const* const pChildrenCountPerLevel, unsigned int const levelCount,
         Matrix* const pFeatureInformationMatrix, unsigned int const targetFeatureIndex, 
@@ -29,6 +30,7 @@ Filter::Filter(int const* const pChildrenCountPerLevel, unsigned int const level
         mpIndexTree[i] = targetFeatureIndex;
         mpScoreTree[i] = 0;
     }
+
 }
 
 Filter::~Filter()
@@ -46,9 +48,10 @@ Filter::build()
         unsigned int const parent_count = mpStartingIndexPerLevel[level + 1]
                 - mpStartingIndexPerLevel[level];
 
+
 #ifdef _OPENMP
 #pragma omp parallel for schedule(dynamic)
-#endif
+#endif 
         for (unsigned int parent = 0; parent < parent_count; ++parent)
             placeElements(
                     mpStartingIndexPerLevel[level + 1] + (parent * mpChildrenCountPerLevel[level]),
@@ -220,6 +223,7 @@ Filter::placeElements(unsigned int const startingIndex, unsigned int childrenCou
                         mpFeatureInformationMatrix->at(mpIndexTree[ancestor_absolute_index], i));
 
                 ancestry_score += std::max(ancestry_score_ij, ancestry_score_ji);
+                
             }
         }
 

@@ -1742,6 +1742,7 @@ static const char __pyx_k_numpy[] = "numpy";
 static const char __pyx_k_range[] = "range";
 static const char __pyx_k_import[] = "__import__";
 static const char __pyx_k_version[] = "__version__";
+static const char __pyx_k_expt_pyx[] = "expt.pyx";
 static const char __pyx_k_miMatrix[] = "miMatrix";
 static const char __pyx_k_ValueError[] = "ValueError";
 static const char __pyx_k_dataMatrix[] = "dataMatrix";
@@ -1754,12 +1755,14 @@ static const char __pyx_k_targetCount[] = "targetCount";
 static const char __pyx_k_RuntimeError[] = "RuntimeError";
 static const char __pyx_k_featureCount[] = "featureCount";
 static const char __pyx_k_featureTypes[] = "featureTypes";
+static const char __pyx_k_priorsLength[] = "priorsLength";
 static const char __pyx_k_priorsMatrix[] = "priorsMatrix";
 static const char __pyx_k_priorsWeight[] = "priorsWeight";
 static const char __pyx_k_sampleStrata[] = "sampleStrata";
 static const char __pyx_k_sampleWeights[] = "sampleWeights";
 static const char __pyx_k_bootstrapCount[] = "bootstrapCount";
 static const char __pyx_k_export_filters[] = "export_filters";
+static const char __pyx_k_solutionLength[] = "solutionLength";
 static const char __pyx_k_fixedFeatureCount[] = "fixedFeatureCount";
 static const char __pyx_k_cline_in_traceback[] = "cline_in_traceback";
 static const char __pyx_k_sampleStratumCount[] = "sampleStratumCount";
@@ -1790,6 +1793,7 @@ static PyObject *__pyx_n_s_dataMatrix;
 static PyObject *__pyx_n_s_export_filters;
 static PyObject *__pyx_n_s_export_mim;
 static PyObject *__pyx_n_s_expt;
+static PyObject *__pyx_kp_s_expt_pyx;
 static PyObject *__pyx_n_s_featureCount;
 static PyObject *__pyx_n_s_featureTypes;
 static PyObject *__pyx_n_s_fixedFeatureCount;
@@ -1805,7 +1809,7 @@ static PyObject *__pyx_n_s_numpy;
 static PyObject *__pyx_kp_s_numpy_core_multiarray_failed_to;
 static PyObject *__pyx_kp_s_numpy_core_umath_failed_to_impor;
 static PyObject *__pyx_n_s_outX;
-static PyObject *__pyx_n_s_priorsCount;
+static PyObject *__pyx_n_s_priorsLength;
 static PyObject *__pyx_n_s_priorsMatrix;
 static PyObject *__pyx_n_s_priorsWeight;
 static PyObject *__pyx_kp_s_pymrmre_expt_expt_pyx;
@@ -2245,7 +2249,6 @@ static PyObject *__pyx_pf_4expt_export_filters(CYTHON_UNUSED PyObject *__pyx_sel
  *                             featureCount, sampleStratumCount, &targetFeatureIndices[0], fixedFeatureCount,
  *                             targetCount, continuousEstimator, outX, bootstrapCount, &miMatrix[0])             # <<<<<<<<<<<<<<
  * 
- *     return res
  */
   __pyx_t_8 = 0;
 
@@ -5549,6 +5552,7 @@ static __Pyx_StringTabEntry __pyx_string_tab[] = {
   {&__pyx_n_s_export_filters, __pyx_k_export_filters, sizeof(__pyx_k_export_filters), 0, 0, 1, 1},
   {&__pyx_n_s_export_mim, __pyx_k_export_mim, sizeof(__pyx_k_export_mim), 0, 0, 1, 1},
   {&__pyx_n_s_expt, __pyx_k_expt, sizeof(__pyx_k_expt), 0, 0, 1, 1},
+  {&__pyx_kp_s_expt_pyx, __pyx_k_expt_pyx, sizeof(__pyx_k_expt_pyx), 0, 0, 1, 0},
   {&__pyx_n_s_featureCount, __pyx_k_featureCount, sizeof(__pyx_k_featureCount), 0, 0, 1, 1},
   {&__pyx_n_s_featureTypes, __pyx_k_featureTypes, sizeof(__pyx_k_featureTypes), 0, 0, 1, 1},
   {&__pyx_n_s_fixedFeatureCount, __pyx_k_fixedFeatureCount, sizeof(__pyx_k_fixedFeatureCount), 0, 0, 1, 1},
