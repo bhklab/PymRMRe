@@ -53,7 +53,7 @@ c_export_filters(const int * const childrenCountPerLevel,
     expt.push_back(causality);
     expt.push_back(scores);
 
-    int targetFeatureLength = targetCount;
+    unsigned int targetFeatureLength = targetCount;
 
 
     for (unsigned int i = 0; i < targetFeatureLength; ++i)
