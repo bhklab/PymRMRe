@@ -4,10 +4,9 @@
 #include <cmath>
 #include <limits>
 
-
 #ifdef _OPENMP
 #include <omp.h>
-#endif 
+#endif
 
 #include <vector>
 

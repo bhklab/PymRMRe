@@ -19,7 +19,7 @@ c_export_filters(const int * const childrenCountPerLevel,
                 const unsigned int levelCount,
                 double* const dataMatrix, 
                 double* const priorsMatrix, 
-                const unsigned int priorsLength,
+                const unsigned int priorsCount,
                 const double priorsWeight,
                 const int* const sampleStrata, 
                 const double* const sampleWeights, 
@@ -29,11 +29,17 @@ c_export_filters(const int * const childrenCountPerLevel,
                 const unsigned int sampleStratumCount, 
                 unsigned int* targetFeatureIndices, 
                 const unsigned int fixedFeatureCount,
-                const unsigned int solutionLength,
+                const unsigned int targetCount,
                 const unsigned int continuousEstimator, 
                 const unsigned int outX, 
                 const unsigned int bootstrapCount, 
                 double* const miMatrix);
+        // priorsMatrix is array? Instead of matrix? 
+        // dataMatrix is array? Instead of matrix?
+        // FeatureCount is array? Instead of integer? 
+        // priorsWeight are sured to be the scalar
+        // miMatrix is array?
+        ////// The data types (const stuff) have been all clear, except the targetFeatureIndices 
 
 /* 
 std::pair <vector<vector<int> >, vector<vector<vector<double> > > >
