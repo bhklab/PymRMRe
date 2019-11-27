@@ -36,6 +36,7 @@ setup(
     url="https://github.com/bhklab/PymRMRe",
     author="Bo Li, Benjamin Haibe-Kains",
     author_email="benjamin.haibe.kains@utoronto.ca",
+    test_suite = 'tests',
     packages=find_packages(),
     include_package_data=True,
     install_requires=requirements,

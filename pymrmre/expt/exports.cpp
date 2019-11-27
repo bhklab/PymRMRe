@@ -197,22 +197,22 @@ c_export_mim(double* const dataMatrix,
     return;
 }
 
-void 
-get_thread_count(unsigned int threadCount)
-{
-#ifdef _OPENMP
-    threadCount = omp_get_max_threads();
-#endif
+// void 
+// get_thread_count(unsigned int threadCount)
+// {
+// #ifdef _OPENMP
+//     threadCount = omp_get_max_threads();
+// #endif
 
-    return;
-}
+//     return;
+// }
 
-void 
-set_thread_count(unsigned int const threadCount)
-{
-#ifdef _OPENMP
-    opm_set_num_threads(threadCount);
-#endif
+// void 
+// set_thread_count(unsigned int const threadCount)
+// {
+// #ifdef _OPENMP
+//     opm_set_num_threads(threadCount);
+// #endif
 
-    return;
-}
+//     return;
+// }
