@@ -25,8 +25,8 @@ requirements = [
 ]
 
 if sys.platform == 'darwin':
-  os.environ['CC'] = 'gcc'
-  os.environ['CXX'] = 'g++'
+  os.environ['CC'] = 'gcc-8'
+  os.environ['CXX'] = 'g++-8'
 
 setup(
     name = "pymrmre",
