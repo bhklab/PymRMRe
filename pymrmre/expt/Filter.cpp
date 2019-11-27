@@ -193,7 +193,7 @@ Filter::placeElements(unsigned int const startingIndex, unsigned int childrenCou
         
         double ancestry_score = 0.;
         
-        for (int j = 0; j < mFixedFeatureCount; ++j) 
+        for (unsigned int j = 0; j < mFixedFeatureCount; ++j) 
         {
             double ancestry_score_ij = Math::computeMi(
                     mpFeatureInformationMatrix->at(i, j));
