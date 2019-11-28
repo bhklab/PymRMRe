@@ -11,13 +11,24 @@ with open('README.md') as fh:
 
 expt = ["expt.pyx", "Matrix.cpp", "Data.cpp", "MutualInformationMatrix.cpp", "Filter.cpp", "Math.cpp"]
 
-extensions = Extension(
-    "expt", 
-    sources = ["pymrmre/expt/" + str for str in expt], 
-    language = "c++",
-    extra_link_args=['-fopenmp'],
-    extra_compile_args=["-fopenmp", "-Ofast"],
-)
+if sys.platform == 'win32':
+    extensions = Extension(
+        "expt", 
+        sources = ["pymrmre/expt/" + str for str in expt], 
+        language = "c++",
+        extra_link_args=["/openmp"],
+        extra_compile_args=["/openmp", "/Ot"],
+    )
+else:
+    extensions = Extension(
+        "expt", 
+        sources = ["pymrmre/expt/" + str for str in expt], 
+        language = "c++",
+        extra_link_args=['-fopenmp'],
+        extra_compile_args=["-fopenmp", "-Ofast"],
+    )
+
+
 
 requirements = [
     'numpy',
