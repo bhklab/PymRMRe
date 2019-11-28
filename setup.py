@@ -41,9 +41,10 @@ if sys.platform == 'darwin':
 
 setup(
     name = "pymrmre",
-    version="0.1.0",
+    version="0.1.1",
     description="A Python package for Parallelized Minimum Redundancy, Maximum Relevance (mRMR) Ensemble Feature selections.",
     long_description=readme,
+    long_description_content_type='text/markdown',
     url="https://github.com/bhklab/PymRMRe",
     author="Bo Li, Benjamin Haibe-Kains",
     author_email="benjamin.haibe.kains@utoronto.ca",
