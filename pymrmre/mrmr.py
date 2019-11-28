@@ -2,8 +2,8 @@
 import numpy as np
 import pandas as pd
 import os
-from .MrmreData import *
-from .MrmreFilter import *
+from MrmreData import *
+from MrmreFilter import *
 
 def mrmr_ensemble(features : pd.DataFrame,
                   target_features : list,
@@ -16,6 +16,20 @@ def mrmr_ensemble(features : pd.DataFrame,
                   return_index : bool = False,
                   return_with_fixed : bool = True):
 
+    '''
+    :param features: Pandas dataframe, the input dataset
+    :param target_features: List, the list of target features, could be column names of indices
+    :param feature_types: List, the feature types (continuous, discrete, survival) of all columns in features
+    :param solution_length: Integer, the number of features contained in one solution
+    :param solution_count: Integer, the number of solutions to be returned
+    :param fixed_feature_count: Integer, the number of features to be fixed in solutions
+    :param method: String, the different ways to run the algorithm, exhaustive or bootstrap
+    :param estimator: String, the way of computing continuous estimators
+    :param return_index: Boolean, to determine whether the solution contains the indices or column names of selected features
+    :param return_with_fixed: Boolean, to determine whether the solution contains the fixed selected features
+    :return: The pandas series, the solutions of selected features
+    '''
+    
     ## Handle some corner cases
     # The input features type
     if len(feature_types) != features.shape[1]:
@@ -60,6 +74,7 @@ def mrmr_ensemble(features : pd.DataFrame,
     # Build the mRMR Filter
     levels = [solution_count] + [1] * (solution_length - fixed_feature_count - 1)
     mrmr_filter = MrmreFilter(data = mrmr_data, 
+                              method = method,
                               target_indices = target_indices, 
                               fixed_feature_count = fixed_feature_count,
                               levels = levels)
@@ -79,6 +94,7 @@ def mrmr_ensemble(features : pd.DataFrame,
                 result.append(list(value[:, col]))
                 if fixed_feature_count > 0 and return_with_fixed:
                     result[-1] = list(range(fixed_feature_count)) + result[-1]
+            
             solutions.append(result)
     
     else:
@@ -95,9 +111,11 @@ def mrmr_ensemble(features : pd.DataFrame,
                 result.append(list(value[:, col]))
                 if fixed_feature_count > 0 and return_with_fixed:
                     result[-1] = list(range(fixed_feature_count)) + result[-1]
-                solutions.append(find_feature_names(result[-1]))
+                result[-1] = find_feature_names(result[-1])
+            
+            solutions.append(result)
     
-    solutions = pd.Series([solutions])
+    solutions = pd.Series(solutions)
     solutions.index = indices
     
     return solutions
