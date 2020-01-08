@@ -28,11 +28,10 @@ else:
         extra_compile_args=["-fopenmp", "-Ofast"],
     )
 
-
-
 requirements = [
     'numpy',
-    'pandas'
+    'pandas',
+    'scipy'
 ]
 
 if sys.platform == 'darwin':
