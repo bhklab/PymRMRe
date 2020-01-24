@@ -1,2 +1,2 @@
-from .expt import *
+import expt
 from .mrmr import *

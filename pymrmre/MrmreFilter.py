@@ -3,6 +3,7 @@ import pandas as pd
 from .MrmreData import *
 from .constants import *
 from scipy.special import comb
+from expt import *
 
 class MrmreFilter:
 
