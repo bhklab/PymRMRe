@@ -21,12 +21,6 @@ expt = ["expt.pyx", "Matrix.cpp", "Data.cpp", "MutualInformationMatrix.cpp", "Fi
 #     #     extra_compile_args=["/openmp", "/Ot"],
 #     # )
 # else:
-extensions = Extension(
-    "expt", 
-    sources = ["pymrmre/expt/" + str for str in expt], 
-    language = "c++",
-    include_dirs=[np.get_include()],
-)
 
 requirements = [
     'numpy',
@@ -34,8 +28,22 @@ requirements = [
     'scipy'
 ]
 
-#if sys.platform == 'darwin':
-    #raise Exception('Due to Clang compiler issues this package is not yet supported on macOS...')
+if sys.platform == 'darwin':
+    extensions = Extension(
+    "expt", 
+    sources = ["pymrmre/expt/" + str for str in expt], 
+    language = "c++",
+    include_dirs=[np.get_include()],
+    extra_compile_args = ["-stdlib=libc++"],
+    extra_link_args = ["-stdlib=libc++"],
+    ) 
+else:
+    extensions = Extension(
+    "expt", 
+    sources = ["pymrmre/expt/" + str for str in expt], 
+    language = "c++",
+    include_dirs=[np.get_include()],
+    )
 
 #   os.environ['CC'] = 'gcc-8'
 #   os.environ['CXX'] = 'g++-8'
