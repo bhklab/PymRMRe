@@ -11,22 +11,22 @@ with open('README.md') as fh:
 
 expt = ["expt.pyx", "Matrix.cpp", "Data.cpp", "MutualInformationMatrix.cpp", "Filter.cpp", "Math.cpp"]
 
-if sys.platform == 'win32':
-    raise Exception('Due to MSVC compiler issues this package is not yet supported on Windows...')
-    # extensions = Extension(
-    #     "expt", 
-    #     sources = ["pymrmre/expt/" + str for str in expt], 
-    #     language = "c++",
-    #     extra_link_args=["/openmp"],
-    #     extra_compile_args=["/openmp", "/Ot"],
-    # )
-else:
-    extensions = Extension(
-        "expt", 
-        sources = ["pymrmre/expt/" + str for str in expt], 
-        language = "c++",
-        include_dirs=[np.get_include()],
-    )
+# if sys.platform == 'win32':
+#     #raise Exception('Due to MSVC compiler issues this package is not yet supported on Windows...')
+#     # extensions = Extension(
+#     #     "expt", 
+#     #     sources = ["pymrmre/expt/" + str for str in expt], 
+#     #     language = "c++",
+#     #     extra_link_args=["/openmp"],
+#     #     extra_compile_args=["/openmp", "/Ot"],
+#     # )
+# else:
+extensions = Extension(
+    "expt", 
+    sources = ["pymrmre/expt/" + str for str in expt], 
+    language = "c++",
+    include_dirs=[np.get_include()],
+)
 
 requirements = [
     'numpy',
@@ -34,8 +34,8 @@ requirements = [
     'scipy'
 ]
 
-if sys.platform == 'darwin':
-    raise Exception('Due to Clang compiler issues this package is not yet supported on macOS...')
+#if sys.platform == 'darwin':
+    #raise Exception('Due to Clang compiler issues this package is not yet supported on macOS...')
 
 #   os.environ['CC'] = 'gcc-8'
 #   os.environ['CXX'] = 'g++-8'
