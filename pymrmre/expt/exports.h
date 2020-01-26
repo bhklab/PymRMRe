@@ -7,7 +7,7 @@
 #include <utility>
 
 #include "Filter.h"
-#include "Math.h"
+#include "MathExtensions.h"
 #include "MutualInformationMatrix.h"
 
 using namespace std;

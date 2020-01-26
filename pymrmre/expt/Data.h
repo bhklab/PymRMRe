@@ -2,7 +2,7 @@
 #define mRMRe_Data_h
 
 #include <limits>
-#include "Math.h"
+#include "MathExtensions.h"
 #include "Matrix.h"
 
 class Data 

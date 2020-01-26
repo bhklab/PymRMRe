@@ -10,7 +10,7 @@
 
 #include <vector>
 
-#include "Math.h"
+#include "MathExtensions.h"
 #include "Matrix.h"
 
 class Filter

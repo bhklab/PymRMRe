@@ -9,7 +9,7 @@ import sys
 with open('README.md') as fh:
       readme = fh.read()
 
-expt = ["expt.pyx", "Matrix.cpp", "Data.cpp", "MutualInformationMatrix.cpp", "Filter.cpp", "Math.cpp"]
+expt = ["expt.pyx", "Matrix.cpp", "Data.cpp", "MutualInformationMatrix.cpp", "Filter.cpp", "MathExtensions.cpp"]
 
 # if sys.platform == 'win32':
 #     #raise Exception('Due to MSVC compiler issues this package is not yet supported on Windows...')
@@ -42,7 +42,7 @@ else:
     "expt", 
     sources = ["pymrmre/expt/" + str for str in expt], 
     language = "c++",
-    include_dirs=[np.get_include()],
+    #include_dirs=[np.get_include()],
     )
 
 #   os.environ['CC'] = 'gcc-8'
