@@ -11,17 +11,6 @@ with open('README.md') as fh:
 
 expt = ["expt.pyx", "Matrix.cpp", "Data.cpp", "MutualInformationMatrix.cpp", "Filter.cpp", "MathExtensions.cpp"]
 
-# if sys.platform == 'win32':
-#     #raise Exception('Due to MSVC compiler issues this package is not yet supported on Windows...')
-#     # extensions = Extension(
-#     #     "expt", 
-#     #     sources = ["pymrmre/expt/" + str for str in expt], 
-#     #     language = "c++",
-#     #     extra_link_args=["/openmp"],
-#     #     extra_compile_args=["/openmp", "/Ot"],
-#     # )
-# else:
-
 requirements = [
     'numpy',
     'pandas',
@@ -45,12 +34,9 @@ else:
     #include_dirs=[np.get_include()],
     )
 
-#   os.environ['CC'] = 'gcc-8'
-#   os.environ['CXX'] = 'g++-8'
-
 setup(
     name = "pymrmre",
-    version="0.1.2",
+    version="0.1.3",
     description="A Python package for Parallelized Minimum Redundancy, Maximum Relevance (mRMR) Ensemble Feature selections.",
     long_description=readme,
     long_description_content_type='text/markdown',
