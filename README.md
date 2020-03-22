@@ -22,3 +22,11 @@ pandas(>=0.25.0)
 
 
 ## Installation
+`
+pip install Pymrmre
+`
+
+
+
+
+
