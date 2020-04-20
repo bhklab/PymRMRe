@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ windows-latest]
+        os: [ ubuntu-latest, windows-latest]
         python-version: [3.7, 3.8]
     # Select python versions to compile on
     steps:
@@ -29,7 +29,6 @@ jobs:
           python -m pip install setuptools wheel twine
           python -m pip install cython numpy pandas
       - name: Build wheels
-        run: |
             python setup.py sdist bdist_wheel
       # - name: Run tests
       #   run: |
