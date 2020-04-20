@@ -14,7 +14,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ macos-latest, windows-latest]
+        os: [ windows-latest]
         python-version: [3.7, 3.8]
     # Select python versions to compile on
     steps:
@@ -26,7 +26,7 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          python -m pip install setuptools wheel twine pytest
+          python -m pip install setuptools wheel twine
           python -m pip install cython numpy pandas
           export PATH=/home/runner/.local/bin:$PATH
       - name: Build wheels
