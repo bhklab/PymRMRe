@@ -34,7 +34,7 @@ jobs:
           if [[ $OSTYPE == "linux-gnu" ]]; then
             python setup.py sdist
           else
-            python setop.py sdist bdistwheel
+            python setup.py sdist bdistwheel
           fi
       # - name: Run tests
       #   run: |
