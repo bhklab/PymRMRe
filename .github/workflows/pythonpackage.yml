@@ -28,14 +28,9 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install setuptools wheel twine
           python -m pip install cython numpy pandas
-          export PATH=/home/runner/.local/bin:$PATH
       - name: Build wheels
         run: |
-          if [[ $OSTYPE == "linux-gnu" ]]; then
-            python setup.py sdist
-          else
             python setup.py sdist bdist_wheel
-          fi
       # - name: Run tests
       #   run: |
       #     python -m pytest tests/test_pymrmre.py     
