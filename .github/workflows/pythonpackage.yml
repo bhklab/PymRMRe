@@ -33,9 +33,7 @@ jobs:
           python setup.py sdist
       # - name: Run tests
       #   run: |
-      #     python -m pytest tests/test_pymrmre.py
-
-      
+      #     python -m pytest tests/test_pymrmre.py     
   build-macos:
     runs-on: macos-latest
     # Select python versions to compile on
