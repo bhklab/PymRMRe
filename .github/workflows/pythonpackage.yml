@@ -15,7 +15,7 @@ jobs:
     # Select python versions to compile on
     strategy:
       matrix:
-        python-versions: [3.7]
+        python-version: 3.7
     steps:
       - uses: actions/checkout@v2 # Checkout repo
       - name: Setup python ${{ matrix.python-version }}
