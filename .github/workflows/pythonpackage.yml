@@ -10,13 +10,12 @@ on:
     branches: [ release ]
 
 jobs:
-  # Select python versions to compile on
-  strategy:
-    matrix:
-      python-versions: [3.7]
-
   build-ubuntu:
     runs-on: ubuntu-latest
+    # Select python versions to compile on
+    strategy:
+      matrix:
+        python-versions: [3.7]
     steps:
       - uses: actions/checkout@v2 # Checkout repo
       - name: Setup python ${{ matrix.python-version }}
