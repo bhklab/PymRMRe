@@ -2,8 +2,8 @@
 import numpy as np
 import pandas as pd
 import os
-from MrmreData import *
-from MrmreFilter import *
+from .MrmreData import *
+from .MrmreFilter import *
 
 
 def mrmr_ensemble(features : pd.DataFrame,
