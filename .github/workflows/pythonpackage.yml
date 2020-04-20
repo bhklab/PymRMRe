@@ -27,12 +27,13 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install setuptools wheel twine pytest
           python -m pip install cython numpy pandas
+          export PATH=/home/runner/.local/bin:$PATH
       - name: Build wheels
         run: |
           python setup.py sdist
       - name: Run tests
         run: |
-          pytest tests/test_pymrmre.py
+          python -m pytest tests/test_pymrmre.py
 
       
   # build-macos:
