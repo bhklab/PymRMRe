@@ -31,11 +31,11 @@ jobs:
           export PATH=/home/runner/.local/bin:$PATH
       - name: Build wheels
         run: |
-        if [[ $OSTYPE == "linux-gnu" ]]; then
-          python setup.py sdist
-        else
-          python setop.py sdist bdistwheel
-        fi
+          if [[ $OSTYPE == "linux-gnu" ]]; then
+            python setup.py sdist
+          else
+            python setop.py sdist bdistwheel
+          fi
       # - name: Run tests
       #   run: |
       #     python -m pytest tests/test_pymrmre.py     
