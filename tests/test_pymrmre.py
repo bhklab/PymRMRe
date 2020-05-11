@@ -38,7 +38,7 @@ class TestPymrmre(unittest.TestCase):
                 fixed_features = [inputs[1]]
 
             feats = mrmr.mrmr_ensemble(features = features, 
-                                    target_features = targets, 
+                                    targets = targets, 
                                     fixed_features = fixed_features,
                                     solution_count = int(inputs[2]), 
                                     solution_length = int(inputs[3]),
