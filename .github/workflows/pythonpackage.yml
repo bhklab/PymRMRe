@@ -44,5 +44,5 @@ jobs:
           KEY: ${{ secrets.pypi_pw }}
         run: |
           python -m pytest tests/test_pymrmre.py
-          python -m twine upload -u $USERNAME -p $KEY dist/*
+          python -m twine --skip-existing upload -u $USERNAME -p $KEY dist/*
 
