@@ -37,5 +37,5 @@ jobs:
       - name: Run tests, push if pass
         run: |
           python -m pytest tests/test_pymrmre.py
-          python twine upload -r pymrmre -u "$pypi_username" -p "$pypi_pw" dist/*
+          python -m twine upload -r pymrmre -u "$pypi_username" -p "$pypi_pw" dist/*
 
