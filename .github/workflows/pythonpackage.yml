@@ -23,8 +23,6 @@ jobs:
         uses: actions/setup-python@v1 # Install python
         with:
           python-version: ${{ matrix.python-version }}
-          pypi_username: ${{ secrets.pypi_username }}
-          pypi_pw: ${{ secrets.pypi_pw }}
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
@@ -35,7 +33,10 @@ jobs:
             python setup.py install
             python setup.py sdist bdist_wheel
       - name: Run tests, push if pass
+        env:
+          USERNAME: ${{ secrets.pypi_username }}
+          KEY: ${{ secrets.pypi_pw }}
         run: |
           python -m pytest tests/test_pymrmre.py
-          python -m twine upload -r pymrmre -u "$pypi_username" -p "$pypi_pw" dist/*
+          python -m twine upload -r pymrmre -u $USERNAME -p $KEY dist/*
 
