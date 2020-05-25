@@ -28,7 +28,13 @@ jobs:
           python -m pip install --upgrade pip
           python -m pip install setuptools wheel twine pytest
           python -m pip install cython numpy pandas
-      - name: Build wheels
+      - name: Build dist
+        if: os.matrix == startsWith("ubuntu")
+        run: |
+            python setup.py install
+            python setup.py sdist
+      - name: Build dist and wheel
+        if: os.matrix != startsWith("ubunutu")
         run: |
             python setup.py install
             python setup.py sdist bdist_wheel
