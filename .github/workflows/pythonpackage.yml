@@ -38,11 +38,20 @@ jobs:
         run: |
             python setup.py install
             python setup.py sdist bdist_wheel
-      - name: Run tests, push if pass
+      - name: Run tests, push if pass (not Windows)
+        if: startsWith(matrix.os,"Windows) == false
         env:
           USERNAME: ${{ secrets.pypi_username }}
           KEY: ${{ secrets.pypi_pw }}
         run: |
           python -m pytest tests/test_pymrmre.py
           python -m twine upload --skip-existing -u $USERNAME -p $KEY dist/*
+      - name: Run tests, push if pass (Windows)
+        if: startsWith(matrix.os,"Windows)
+        env:
+          USERNAME: ${{ secrets.pypi_username }}
+          KEY: ${{ secrets.pypi_pw }}
+        run: |
+          python -m pytest tests/test_pymrmre.py
+          python -m twine upload --skip-existing -u $env:USERNAME -p $env:KEY dist/*
 
