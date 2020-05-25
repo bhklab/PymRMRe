@@ -38,5 +38,5 @@ jobs:
           KEY: ${{ secrets.pypi_pw }}
         run: |
           python -m pytest tests/test_pymrmre.py
-          python -m twine upload -r pymrmre -u $USERNAME -p $KEY dist/*
+          python -m twine upload --repository-url https://pypi.org/project/pymrmre/ -u $USERNAME -p $KEY dist/*
 
