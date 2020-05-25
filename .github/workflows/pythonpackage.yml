@@ -29,12 +29,12 @@ jobs:
           python -m pip install setuptools wheel twine pytest
           python -m pip install cython numpy pandas
       - name: Build dist
-        if: startsWith(matrix.os, "ubuntu")
+        if: startsWith(matrix.os,'ubuntu')
         run: |
             python setup.py install
             python setup.py sdist
       - name: Build dist and wheel
-        if: startsWith(matrix.os, "ubuntu") == false
+        if: startsWith(matrix.os,'ubuntu') == false
         run: |
             python setup.py install
             python setup.py sdist bdist_wheel
