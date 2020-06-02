@@ -36,7 +36,7 @@ else:
 
 setup(
     name = "pymrmre",
-    version="1.0.3",
+    version="1.0.4",
     description="A Python package for Parallelized Minimum Redundancy, Maximum Relevance (mRMR) Ensemble Feature selections.",
     long_description=readme,
     long_description_content_type='text/markdown',
