@@ -10,12 +10,13 @@ on:
     branches: [ release ]
 
 jobs:
-  build-ubuntu:
-    runs-on: ubuntu-latest
-    # Select python versions to compile on
+  build:
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        python-versions: [3.7]
+        os: [ ubuntu-latest, macos-latest, windows-latest]
+        python-version: [3.7, 3.8]
+    # Select python versions to compile on
     steps:
       - uses: actions/checkout@v2 # Checkout repo
       - name: Setup python ${{ matrix.python-version }}
@@ -25,46 +26,32 @@ jobs:
       - name: Install dependencies
         run: |
           python -m pip install --upgrade pip
-          pip install setuptools wheel twine pytest
-          pip install cython numpy pandas
-      - name: Build wheels
+          python -m pip install setuptools wheel twine pytest
+          python -m pip install cython numpy pandas
+      - name: Build dist
+        if: startsWith(matrix.os,'ubuntu')
         run: |
-          python setup.py sdist bdistwheel
-      
-  # build-macos:
-  #   runs-on: macos-latest
-  #   steps:
-  #     - uses: actions/checkout@v2 
-  #     - name: Setup python ${{ matrix.python-version }}
-  #       uses: actions/setup-python@v1
-  #       with:
-  #       python-version: ${{ matrix.python-version }} 
-  #     - name: Install dependencies
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install setuptools wheel twine
-  #         pip install cython numpy pandas
-  #     - name: Build wheels
-  #       run: |
-  #         python setup.py sdist bdistwheel
-
-  
-  # build-windows:
-  #   runs-on: windows-latest
-  #   steps:
-  #     - uses: actions/checkout@v2
-  #     - name: Setup python ${{ matrix.python-version }}
-  #       uses: actions/setup-python@v1
-  #       with:
-  #         python-version: ${{ matrix.python-version }}
-  #     - name: Install dependencies
-  #       run: |
-  #         python -m pip install --upgrade pip
-  #         pip install setuptools wheel twine
-  #         pip install cython numpy pandas
-  #     - name: Build wheels
-  #       run: |
-  #         python setup.py sdist bdistwheel
-
-  
+            python setup.py install
+            python setup.py sdist
+      - name: Build dist and wheel
+        if: startsWith(matrix.os,'ubuntu') == false
+        run: |
+            python setup.py install
+            python setup.py sdist bdist_wheel
+      - name: Run tests, push if pass (not Windows)
+        if: startsWith(matrix.os,'Windows') == false
+        env:
+          USERNAME: ${{ secrets.pypi_username }}
+          KEY: ${{ secrets.pypi_pw }}
+        run: |
+          python -m pytest tests/test_pymrmre.py
+          python -m twine upload --skip-existing -u $USERNAME -p $KEY dist/*
+      - name: Run tests, push if pass (Windows)
+        if: startsWith(matrix.os,'Windows')
+        env:
+          USERNAME: ${{ secrets.pypi_username }}
+          KEY: ${{ secrets.pypi_pw }}
+        run: |
+          python -m pytest tests/test_pymrmre.py
+          python -m twine upload --skip-existing -u $env:USERNAME -p $env:KEY dist/*
 
