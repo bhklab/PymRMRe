@@ -81,7 +81,7 @@ def mrmr_ensemble(features : pd.DataFrame,
                           feature_types = feature_types)
 
     # Error for a case known to break c_estimate_filters in the C++ code
-    if (len(fixed_features) + len(category_features)) > features.shape[1] - 1:
+    if (len(fixed_features) + len(category_features)) >= features.shape[1] - 1:
         raise Exception('This function does not work when there are only fixed'
                         'and categorical features')
 
