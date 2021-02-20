@@ -74,13 +74,18 @@ def mrmr_ensemble(features : pd.DataFrame,
 
     for x in category_features:
         feature_types[features.columns.get_loc(x)] = 1
+        print(feature_types)
 
     ## Build the mRMR data
     mrmr_data = MrmreData(data = features, 
                           feature_types = feature_types)
 
-    # Find the target indices and fixed features selected
+    # Error for a case known to break c_estimate_filters in the C++ code
+    if (len(fixed_features) + len(category_features)) > features.shape[1] - 1:
+        raise Exception('This function does not work when there are only fixed'
+                        'and categorical features')
 
+    # Find the target indices and fixed features selected
 
     ## Build the mRMR Filter
     levels = [solution_count] + [1] * (solution_length - fixed_feature_count - 1)
