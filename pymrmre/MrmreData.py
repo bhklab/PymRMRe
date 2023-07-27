@@ -71,7 +71,7 @@ class MrmreData:
         ## Still need to figure out what it want to return
         ## Still what about the survival data? 
         feature_data = pd.DataFrame()
-        for i, feature_type in self._feature_types.iteritems():
+        for i, feature_type in self._feature_types.items():
             if feature_type == self._feature_map['continuous']:
                 feature = self._data.iloc[:, i]
             elif feature_type == self._feature_map['discrete']:
@@ -231,7 +231,7 @@ class MrmreData:
         expanded_matrix, adaptor = [], []
         # Compute the adaptor
         i = 0
-        for _, item in self._feature_types.iteritems():
+        for _, item in self._feature_types.items():
             if item != 3:
                 adaptor.append(i)
             i += 1
@@ -255,7 +255,7 @@ class MrmreData:
     def _compressFeatureMatrix(self, matrix):
        # Compute the adaptor
         i, adaptor = 0, []
-        for _, item in self._feature_types.iteritems():
+        for _, item in self._feature_types.items():
             if item != 3:
                 adaptor.append(i)
             i += 1
@@ -267,7 +267,7 @@ class MrmreData:
         indices = list(indices)
         # Compute the adaptor
         i, adaptor = 1, []
-        for _, item in self._feature_types.iteritems():
+        for _, item in self._feature_types.items():
             if item == 3:
                 adaptor.append(i)
             i += 1
@@ -284,7 +284,7 @@ class MrmreData:
         indices = list(indices)
         # Compute the adaptor
         i, adaptor = 1, []
-        for _, item in self._feature_types.iteritems():
+        for _, item in self._feature_types.items():
             if item == 3:
                 adaptor.append(i)
             i += 1
