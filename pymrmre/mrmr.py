@@ -198,7 +198,6 @@ def mrmr_ensemble_survival(features : pd.DataFrame,
             raise Exception('Some of fixed features are not in input data')
 
     if fixed_feature_count != 0:
-        # JP Note: Do we assume the fixed features must be at the start?
         ## Some problems may exist here
         #fixed_features.append(fixed_features.pop(fixed_features.index(event)))
         non_fixed_features = [x for x in features.columns if x not in fixed_features and x != time and x != event]
