@@ -198,18 +198,20 @@ def mrmr_ensemble_survival(features : pd.DataFrame,
             raise Exception('Some of fixed features are not in input data')
 
     if fixed_feature_count != 0:
+        # JP Note: Do we assume the fixed features must be at the start?
         ## Some problems may exist here
         #fixed_features.append(fixed_features.pop(fixed_features.index(event)))
         non_fixed_features = [x for x in features.columns if x not in fixed_features and x != time and x != event]
         features = features.reindex(columns = fixed_features + [event, time] + non_fixed_features)
     else:
+        # JP NOTE: What is the point of this?
         ## Some problems may exist here
         non_surv_features = [x for x in features.columns if x != time and x != event]
         mid = len(non_surv_features) // 2
         features = features.reindex(columns = non_surv_features[0:mid] + [event,time] + non_surv_features[mid:])
         #features = features.reindex(columns = non_surv_features[0:8] + [event,time] + non_surv_features[8:])
 
-    target_indices = [features.columns.get_loc(time)] 
+    target_indices = [features.columns.get_loc(event)] 
 
     ## Build the feature types
     feature_types = [0] * features.shape[1]
