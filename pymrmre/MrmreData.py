@@ -43,11 +43,14 @@ class MrmreData:
         if self._feature_types.sum() == 0:
             self._data = data
         else:
-            for i, col in enumerate(data):
-                if self._feature_types[i] == 1:     # Factor variables
-                    self._data[col] = data.loc[:, col].astype(int) - 1
-                else:  
-                    self._data[col] = data.loc[:, col]
+            self._data = data.copy()
+            mask = pd.Series((self._feature_types==1).values, index=self._data.columns)
+            self._data.loc[:, mask] = self._data.loc[:, mask].astype(int) - 1
+            #for i, col in enumerate(data):
+            #    if self._feature_types[i] == 1:     # Factor variables
+            #        self._data[col] = data.loc[:, col].astype(int) - 1
+            #    else:  
+            #        self._data[col] = data.loc[:, col]
         
 
         # Sample Stratum processing
