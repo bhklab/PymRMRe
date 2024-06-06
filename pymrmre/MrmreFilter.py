@@ -33,7 +33,7 @@ class MrmreFilter:
             raise Exception('data must be of type MrmreData')
         '''
         
-        if data._priors and len(data._priors) != 0:
+        if data._priors.size > 0 and len(data._priors) != 0:
             if not prior_weight:
                 raise Exception('prior weight must be provided if there are priors')
             elif prior_weight < 0 or prior_weight > 1:

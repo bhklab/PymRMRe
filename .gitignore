@@ -3,3 +3,6 @@ build
 dist
 .eggs
 *egg*
+*__pycache__*
+*pyd
+pymrmre/expt/expt.cpp
