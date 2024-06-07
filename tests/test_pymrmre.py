@@ -46,6 +46,97 @@ class TestPymrmre(unittest.TestCase):
                 
             assert self.feats[s] == feats.iloc[0]
 
+R_TIME_RESULTS = [
+    "lbp-3D-k_glszm_LargeAreaLowGrayLevelEmphasis",
+    "logarithm_firstorder_Skewness",
+    "lbp-2D_glszm_ZoneVariance",
+    "lbp-3D-k_glszm_ZoneVariance",
+    "logarithm_firstorder_Skewness",
+    "lbp-2D_glszm_ZoneVariance",
+    "original_glrlm_GrayLevelNonUniformity",
+    "logarithm_glcm_Imc2",
+    "wavelet-LHL_glcm_ClusterShade",
+    "lbp-3D-k_glszm_LargeAreaEmphasis",
+    "logarithm_firstorder_Skewness",
+    "lbp-2D_glszm_ZoneVariance",
+    "lbp-3D-k_glszm_LargeAreaHighGrayLevelEmphasis",
+    "logarithm_firstorder_Skewness",
+    "lbp-2D_glszm_ZoneVariance",
+]
+
+R_SURVIVAL_RESULTS = [
+    "lbp-2D_firstorder_Median",
+    "lbp-2D_firstorder_90Percentile",
+    "lbp-2D_firstorder_10Percentile",
+    "lbp-3D-m1_firstorder_Median",
+    "lbp-2D_firstorder_90Percentile",
+    "lbp-2D_firstorder_Median",
+    "lbp-2D_firstorder_10Percentile",
+    "lbp-3D-m1_firstorder_Median",
+    "exponential_glcm_Imc1",
+    "lbp-2D_firstorder_90Percentile",
+    "lbp-2D_firstorder_10Percentile",
+    "lbp-3D-m1_firstorder_Median",
+    "lbp-2D_glszm_ZoneVariance",
+    "lbp-2D_firstorder_90Percentile",
+    "lbp-2D_firstorder_10Percentile",
+]
+
+R_SURVIVAL_RESULTS_ONE = [
+    "lbp-2D_firstorder_Median",
+    "lbp-3D-m1_firstorder_Median",
+    "lbp-2D_firstorder_10Percentile",
+    "lbp-2D_firstorder_90Percentile",
+    "lbp-2D_glszm_ZoneVariance",
+]
+
+R_TIME_RESULTS_ONE = [
+    "lbp-3D-k_glszm_LargeAreaLowGrayLevelEmphasis",
+    "lbp-3D-k_glszm_ZoneVariance",
+    "original_glrlm_GrayLevelNonUniformity",
+    "lbp-3D-k_glszm_LargeAreaEmphasis",
+    "lbp-3D-k_glszm_LargeAreaHighGrayLevelEmphasis",
+]
+
+
+class TestREquivalent(unittest.TestCase):
+    def setUp(self):
+        import os
+        import pandas
+        import numpy as np
+        data_path = os.path.join(os.path.dirname(__file__), "../data")
+        self.joined_features = pandas.read_csv(os.path.join(data_path, "r_data.csv")).astype(np.float64)
+        self.features = self.joined_features.drop(columns=['event', 'time'])
+        self.surv = self.joined_features[['event', 'time']]
+        self.event = self.joined_features['event']
+        self.time = self.joined_features['time']
+
+    def test_mrmr_ensemble_survival_one(self):
+        results = mrmr.mrmr_ensemble_survival(self.features, self.surv, solution_length=1, solution_count=5)
+        results = results[0]
+        results = [r for res in results for r in res]
+        self.assertEqual(results, R_SURVIVAL_RESULTS_ONE)
+        
+    def test_mrmr_ensemble_one(self):
+        results = mrmr.mrmr_ensemble(self.features, self.time.to_frame(), solution_length=1, solution_count=5)
+        results = results[0]
+        results = [r for res in results for r in res]
+        self.assertEqual(results, R_TIME_RESULTS_ONE)
+
+    def test_mrmr_ensemble_survival(self):
+        import numpy as np
+        results = mrmr.mrmr_ensemble_survival(self.features, self.surv, solution_length=3, solution_count=5)
+        results = results[0]
+        results = [r for res in results for r in res]
+        self.assertEqual(results, R_SURVIVAL_RESULTS)
+        
+    def test_mrmr_ensemble(self):
+        results = mrmr.mrmr_ensemble(self.features, self.time.to_frame(), solution_length=3, solution_count=5)
+        results = results[0]
+        results = [r for res in results for r in res]
+        self.assertEqual(results, R_TIME_RESULTS)
+
+
 if __name__ == '__main__':
     unittest.main()
 
