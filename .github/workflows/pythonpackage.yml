@@ -10,11 +10,32 @@ on:
     types: [ opened, synchronize, reopened, closed ]
 
 jobs:
-  build:
+  test:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: [ ubuntu-latest, macos-latest, windows-latest]
+        os: [ ubuntu-latest, macos-14, windows-latest]
+        python-version: [3.7, 3.8]
+    steps:
+      - uses: actions/checkout@v2 # Checkout repo
+      - name: Setup python ${{ matrix.python-version }}
+        uses: actions/setup-python@v1 # Install python
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install setuptools wheel twine pytest
+          python -m pip install cython numpy pandas
+      - name: Run tests
+        run: python -m pytest tests/test_pymrmre.py
+
+  build:
+    if: github.ref == 'refs/heads/release'
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ ubuntu-latest, macos-14, windows-latest]
         python-version: [3.7, 3.8]
     # Select python versions to compile on
     steps:
