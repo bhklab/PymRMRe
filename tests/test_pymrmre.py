@@ -9,7 +9,7 @@ class TestPymrmre(unittest.TestCase):
 
     def setUp(self):
         
-        data_url = 'https://raw.githubusercontent.com/bhklab/PymRMRe/master/data/cgps_ge.csv?token=AF7WH4Y2LWQ7W3PG5KQMWJ2542P66'
+        data_url = 'https://raw.githubusercontent.com/bhklab/PymRMRe/master/data/cgps_ge.csv'
         data = rq.get(data_url).content
         
         self.data = pd.read_csv(io.StringIO(data.decode('utf-8')), index_col = 0)
@@ -26,7 +26,7 @@ class TestPymrmre(unittest.TestCase):
 
     def test_mRMRe(self):
         for s in self.feats.keys():
-            inputs = s.split(',')
+            inputs = s.split(',')  
 
             targets = pd.DataFrame(self.data[inputs[0]])
 
@@ -113,26 +113,26 @@ class TestREquivalent(unittest.TestCase):
 
     def test_mrmr_ensemble_survival_one(self):
         results = mrmr.mrmr_ensemble_survival(self.features, self.surv, solution_length=1, solution_count=5)
-        results = results[0]
+        results = results.iloc[0]
         results = [r for res in results for r in res]
         self.assertEqual(results, R_SURVIVAL_RESULTS_ONE)
         
     def test_mrmr_ensemble_one(self):
         results = mrmr.mrmr_ensemble(self.features, self.time.to_frame(), solution_length=1, solution_count=5)
-        results = results[0]
+        results = results.iloc[0]
         results = [r for res in results for r in res]
         self.assertEqual(results, R_TIME_RESULTS_ONE)
 
     def test_mrmr_ensemble_survival(self):
         import numpy as np
         results = mrmr.mrmr_ensemble_survival(self.features, self.surv, solution_length=3, solution_count=5)
-        results = results[0]
+        results = results.iloc[0]
         results = [r for res in results for r in res]
         self.assertEqual(results, R_SURVIVAL_RESULTS)
         
     def test_mrmr_ensemble(self):
         results = mrmr.mrmr_ensemble(self.features, self.time.to_frame(), solution_length=3, solution_count=5)
-        results = results[0]
+        results = results.iloc[0]
         results = [r for res in results for r in res]
         self.assertEqual(results, R_TIME_RESULTS)
 
