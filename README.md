@@ -42,6 +42,18 @@ Two primary functions are provided in this package currently:
   *  :param *return_with_fixed*: Boolean, to determine whether the solution contains the fixed selected features, the default is True
   *  :return: Pandas series, the solutions of selected features
 
+* mrmr_ensemble_survival: It provides the ensemble (multiple) solutions of feature selection given the input of feature dataset and target column, it supports the feature selection with preselection as well. 
+  *  :param *features*: Pandas dataframe, the input dataset
+  *  :param *targets*: Pandas dataframe, the target features, it must have two columns (event and time of survival data)
+  *  :param *fixed_features*: List, the list of fixed features (column names), the default is empty list
+  *  :param *category_features*: List, the list of features whose types are categorical (column names), the default is empty list
+  *  :param *solution_length*: Integer, the number of features contained in one solution
+  *  :param *solution_count*: Integer, the number of solutions to be returned, the default is 1
+  *  :param *estimator*: String, the way of computing continuous estimators, the default is Pearson
+  *  :param *return_index*: Boolean, to determine whether the solution contains the indices or column names of selected features, the default is False
+  *  :param *return_with_fixed*: Boolean, to determine whether the solution contains the fixed selected features, the default is True
+  *  :return: Pandas series, the solutions of selected features
+
 Example code:
 
 `

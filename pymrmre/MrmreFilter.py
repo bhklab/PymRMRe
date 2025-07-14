@@ -33,7 +33,7 @@ class MrmreFilter:
             raise Exception('data must be of type MrmreData')
         '''
         
-        if data._priors and len(data._priors) != 0:
+        if data._priors.size > 0 and len(data._priors) != 0:
             if not prior_weight:
                 raise Exception('prior weight must be provided if there are priors')
             elif prior_weight < 0 or prior_weight > 1:
@@ -68,6 +68,7 @@ class MrmreFilter:
             if np.prod(levels) - 1 > comb(data.featureCount() - 1, len(levels)):
                 raise Exception('user cannot request for more solutions than is possible given the data set')
 
+            mi_matrix = mi_matrix.flatten("F")
             res = export_filters(self._levels.astype(np.int32),
                                  len(self._levels),
                                  data._data.values.flatten('F'),
@@ -86,7 +87,7 @@ class MrmreFilter:
                                  self._continuous_estimator,
                                  int(outX == True),
                                  bootstrap_count,
-                                 mi_matrix.flatten('F'))
+                                 mi_matrix)
         else:
             raise Exception('Unrecognized method: use exhaustive or bootstrap')
 
@@ -155,7 +156,8 @@ class MrmreFilter:
         _filters = []
         for target_index in self._target_indices:
             result_matrix = self._filters.loc[target_index]
-            causality_dropped = np.where(np.array(self._causality_list.loc[target_index]) > causality_threshold)
+            causality_dropped = np.where((np.array(self._causality_list.loc[target_index]) > causality_threshold) &
+                                         ~np.isnan(self._causality_list.loc[target_index]))
             mi_dropped = np.where(-.5 * np.log(1 - np.square(self._mi_matrix[:, target_index])) < mi_threshold)
             # Nan operation
             dropped = set(list(causality_dropped[0]) + list(mi_dropped[0]))

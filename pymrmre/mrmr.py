@@ -176,6 +176,9 @@ def mrmr_ensemble_survival(features : pd.DataFrame,
     # If the target is survival data, the target should be have two columns (event and time)
     if targets.shape[1] != 2:
         raise Exception("The survial data should be two columns (event and time)")
+    
+    if len(fixed_features) > 0 and return_index:
+        raise Exception("Returning indices is currently not compatible with fixed features.")
 
     # The event and time
     event, time = targets.columns[0], targets.columns[1]
@@ -202,14 +205,20 @@ def mrmr_ensemble_survival(features : pd.DataFrame,
         #fixed_features.append(fixed_features.pop(fixed_features.index(event)))
         non_fixed_features = [x for x in features.columns if x not in fixed_features and x != time and x != event]
         features = features.reindex(columns = fixed_features + [event, time] + non_fixed_features)
-    else:
+    #else:
+        # JP NOTE: This appears to be leftover from investigating some kind of issue. Now we get the same answer no matter what by
+        # applying the _expandFeatureIndices method when returning the solutions. By keeping the target at the end, this also preserves
+        # input feature indices, which means both the indices and the feature names are what a naive user would expect.
+        # For the same reason, when using fixed features, which need to be at the start right of the input array, the output indices will
+        # be wrong, because wwe've internally modified the order of the features. The correct way to fix this would be to keep track of
+        # how things got reordered. An alternative for now is to assert that whenever we use fixed features, we don't allow returning indices.
         ## Some problems may exist here
-        non_surv_features = [x for x in features.columns if x != time and x != event]
-        mid = len(non_surv_features) // 2
-        features = features.reindex(columns = non_surv_features[0:mid] + [event,time] + non_surv_features[mid:])
+        #non_surv_features = [x for x in features.columns if x != time and x != event]
+        #mid = len(non_surv_features) // 2
+        #features = features.reindex(columns = non_surv_features[0:mid] + [event,time] + non_surv_features[mid:])
         #features = features.reindex(columns = non_surv_features[0:8] + [event,time] + non_surv_features[8:])
 
-    target_indices = [features.columns.get_loc(time)] 
+    target_indices = [features.columns.get_loc(event)] 
 
     ## Build the feature types
     feature_types = [0] * features.shape[1]
@@ -247,7 +256,7 @@ def mrmr_ensemble_survival(features : pd.DataFrame,
                 result.append(list(value[:, col]))
                 if fixed_feature_count > 0 and return_with_fixed:
                     result[-1] = list(range(fixed_feature_count)) + result[-1]
-            
+                result[-1] = mrmr_data._expandFeatureIndices(result[-1])
             solutions.append(result)
     
     else:
@@ -264,6 +273,7 @@ def mrmr_ensemble_survival(features : pd.DataFrame,
                 result.append(list(value[:, col]))
                 if fixed_feature_count > 0 and return_with_fixed:
                     result[-1] = list(range(fixed_feature_count)) + result[-1]
+                result[-1] = mrmr_data._expandFeatureIndices(result[-1])
                 result[-1] = find_feature_names(result[-1])
             
             solutions.append(result)
